@@ -8,11 +8,11 @@ import (
 )
 
 type TestPathParams struct {
-	Name string `json:"name"`
+	Name string `json:"name" swag_description:"Hello this is description"`
 }
 
 type BaseResponse struct {
-	Status int `json:"status"`
+	Status int `json:"status" swag_description:"This is status from headers"`
 }
 
 type TestResponse struct {

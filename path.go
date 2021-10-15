@@ -20,6 +20,10 @@ type path struct {
 	responses  map[int]*response
 }
 
+func (p *path) Body(i interface{}) Path {
+	return p
+}
+
 type response struct {
 	schema *spec.Schema
 }
@@ -30,8 +34,6 @@ func (p *path) Params(i interface{}) Path {
 
 func (p *path) Response(status int, what interface{}) Path {
 	_ = p.components.GetSchema(what)
-
-
 
 	return p
 }

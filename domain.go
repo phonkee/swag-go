@@ -14,6 +14,9 @@ type ServiceOptions struct {
 }
 
 type Path interface {
+	// Body is request body
+	Body(interface{}) Path
+
 	// Params adds path params
 	Params(interface{}) Path
 
