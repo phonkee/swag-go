@@ -24,3 +24,15 @@ type Path interface {
 type PathOptions struct {
 	Description string
 }
+
+type Components interface {
+	json.Marshaler
+
+	GetSchema(interface{}) string
+}
+
+type Schemas interface {
+	json.Marshaler
+	// Get stores schema and returns string to be returned
+	GetRef(interface{}) string
+}
