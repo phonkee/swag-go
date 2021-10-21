@@ -53,7 +53,7 @@ type Swagger interface {
 
 type PathOptions struct {
 	Description string
-	OperationID string
+	ID          string
 }
 
 type Path interface {
@@ -68,4 +68,6 @@ type Path interface {
 
 	// Response returned for given status code
 	Response(status int, what interface{}) Path
+
+	Spec() spec.Paths
 }

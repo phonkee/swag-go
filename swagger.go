@@ -8,7 +8,7 @@ import (
 	"github.com/matryer/resync"
 )
 
-type SwaggerOptions struct {
+type Options struct {
 	Description string
 	Version     string
 	Host        string
@@ -18,17 +18,17 @@ type SwaggerOptions struct {
 }
 
 // Defaults fill blank values
-func (s *SwaggerOptions) Defaults() {
+func (s *Options) Defaults() {
 
 }
 
 // New returns new swagger
-func New(title string, options ...*SwaggerOptions) Swagger {
-	var opts *SwaggerOptions
+func New(title string, options ...*Options) Swagger {
+	var opts *Options
 	if len(options) > 0 && options[0] != nil {
 		opts = options[0]
 	} else {
-		opts = &SwaggerOptions{}
+		opts = &Options{}
 	}
 	opts.Defaults()
 	return &swagger{
@@ -61,7 +61,7 @@ func New(title string, options ...*SwaggerOptions) Swagger {
 
 type swagger struct {
 	spec        spec.Swagger
-	options     *SwaggerOptions
+	options     *Options
 	definitions spec.Definitions
 	once        resync.Once
 	generated   *spec.Swagger

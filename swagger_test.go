@@ -9,7 +9,8 @@ import (
 )
 
 type TestPathParams struct {
-	Name string `json:"name" swag_description:"Hello this is description"`
+	Name     string  `json:"name" swag_description:"Hello this is description"`
+	Optional *string `json:"optional"`
 }
 
 type TestQueryParams struct {
@@ -25,7 +26,7 @@ type TestResponse struct {
 }
 
 func TestNew(t *testing.T) {
-	swg := New("Pet store", &SwaggerOptions{
+	swg := New("Pet store", &Options{
 		Description: "Pet store swagger implementation",
 		Version:     "1.0.0",
 		License: &License{
@@ -35,15 +36,16 @@ func TestNew(t *testing.T) {
 	assert.NotNil(t, swg)
 
 	// add post method
-	swg.Path("/hello/world", http.MethodPost).
+	swg.Path("/hello/world", http.MethodPost, &PathOptions{ID: "createHelloWorld"}).
 		PathParams(TestPathParams{}).
 		QueryParams(TestQueryParams{}).
 		Response(http.StatusOK, TestResponse{}).
 		Response(http.StatusNotFound, BaseResponse{}).
 		Response(http.StatusInternalServerError, BaseResponse{})
 
-	// Future
-	// api := swg.PathPrefix("/api/v1")
+	// Future: Prefix returns path prefix where we can set common Response, PathParams, QueryParams for all Path that
+	// are created from it
+	// api := swg.Prefix("/api/v1").Response(http.StatusInternalServerError, BaseResponse{})
 	// api.Path("user", http.MethodGet)
 
 	b, err := json.Marshal(swg)
