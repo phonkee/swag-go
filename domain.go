@@ -1,41 +1,71 @@
 package swag
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/http"
 
-type Service interface {
+	"github.com/go-openapi/spec"
+)
+
+type ContactInfo struct {
+	Name  string
+	URL   string
+	Email string
+}
+
+func (c *ContactInfo) Spec() *spec.ContactInfo {
+	if c == nil {
+		return nil
+	}
+	return &spec.ContactInfo{
+		ContactInfoProps: spec.ContactInfoProps{
+			Name:  c.Name,
+			URL:   c.URL,
+			Email: c.Email,
+		},
+	}
+}
+
+type License struct {
+	Name string
+	URL  string
+}
+
+func (l *License) Spec() *spec.License {
+	if l == nil {
+		return nil
+	}
+	return &spec.License{
+		LicenseProps: spec.LicenseProps{
+			Name: l.Name,
+			URL:  l.URL,
+		},
+	}
+}
+
+type Swagger interface {
+	http.Handler
 	json.Marshaler
 
 	// Path adds new endpoints
 	Path(path string, method string, options ...*PathOptions) Path
 }
 
-type ServiceOptions struct {
+type PathOptions struct {
 	Description string
+	OperationID string
 }
 
 type Path interface {
 	// Body is request body
 	Body(interface{}) Path
 
-	// Params adds path params
-	Params(interface{}) Path
+	// PathParams adds path params
+	PathParams(interface{}) Path
+
+	// QueryParams params
+	QueryParams(interface{}) Path
 
 	// Response returned for given status code
 	Response(status int, what interface{}) Path
-}
-
-type PathOptions struct {
-	Description string
-}
-
-type Components interface {
-	json.Marshaler
-
-	GetSchema(interface{}) string
-}
-
-type Schemas interface {
-	json.Marshaler
-	// Get stores schema and returns string to be returned
-	GetRef(interface{}) string
 }
