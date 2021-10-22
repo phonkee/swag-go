@@ -3,9 +3,11 @@ package swag
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/go-openapi/spec"
 	"github.com/matryer/resync"
+	"gopkg.in/yaml.v2"
 )
 
 type Options struct {
@@ -78,14 +80,33 @@ func (s *swagger) Prefix(pathPrefix string) Prefix {
 
 // ServeHTTP gives ability to use it in net/http
 func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	// add json header
-	writer.Header().Set("Content-Type", "application/json")
+	// check for query value format
+	var format string
+	if f := strings.ToLower(strings.TrimSpace(request.URL.Query().Get("format"))); f != "" {
+		switch f {
+		case "yml", "yaml":
+			format = "yaml"
+			writer.Header().Set("Content-Type", "application/x-yaml")
+		case "json":
+		default:
+			writer.Header().Set("Content-Type", "application/json")
+			format = "json"
+		}
+	}
 
 	writer.WriteHeader(http.StatusOK)
 
-	if err := json.NewEncoder(writer).Encode(s); err != nil {
-		http.Error(writer, "cannot encode json", http.StatusInternalServerError)
-		return
+	switch format {
+	case "json":
+		if err := json.NewEncoder(writer).Encode(s); err != nil {
+			http.Error(writer, "cannot encode json", http.StatusInternalServerError)
+			return
+		}
+	case "yaml":
+		if err := yaml.NewEncoder(writer).Encode(s); err != nil {
+			http.Error(writer, "cannot encode yaml", http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
