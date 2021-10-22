@@ -27,11 +27,6 @@ type ErrorResponse struct {
 service.Path("/api/v1/pets/{id}", http.MethodGet).
     // add path params
     PathParams(GetPathParams{}).
-    // add query params
-    //QueryParams(QueryParams{}).
-    // add body definition
-    //Body(Body{}).
-    // add responses
     Response(http.StatusOK, PetResponse{}).
     Response(http.StatusNotFound).
     Response(http.StatusInternalServerError, ErrorResponse{})
