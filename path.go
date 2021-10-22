@@ -23,7 +23,7 @@ type pathInfo struct {
 	Definitions spec.Definitions
 	Options     *PathOptions
 	Invalidate  func()
-	Swagger     *spec.Swagger
+	Swagger     *swagger
 }
 
 func newPath(info *pathInfo) *path {
@@ -51,7 +51,7 @@ type path struct {
 	responses   map[int]*response
 	invalidate  func()
 	item        spec.PathItem
-	swagger     *spec.Swagger
+	swagger     Swagger
 }
 
 func (p *path) Body(i interface{}) Path {

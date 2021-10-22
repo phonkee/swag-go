@@ -25,11 +25,14 @@ type Swagger interface {
 
 	// Spec returns spec and caches it
 	Spec() *spec.Swagger
+
+	// private methods
 }
 
 type PathOptions struct {
 	Description string
 	ID          string
+	Tags        []string
 }
 
 type Path interface {

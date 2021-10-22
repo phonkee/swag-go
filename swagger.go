@@ -197,6 +197,7 @@ func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
 		Definitions: s.definitions,
 		Options:     opts,
 		Invalidate:  func() { s.once.Reset() },
+		Swagger:     s,
 	})
 	s.paths = append(s.paths, np)
 
