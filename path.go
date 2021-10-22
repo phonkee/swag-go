@@ -141,14 +141,22 @@ func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 }
 
 // Response adds response to path
-func (p *path) Response(status int, what interface{}) Path {
+func (p *path) Response(status int, what ...interface{}) Path {
 	p.invalidate()
-	if what == nil {
+
+	// no response
+	if len(what) == 0 {
+		p.responses[status] = nil
+		return p
+	}
+
+	// if there is nil specified, we need to delete all
+	if what[0] == nil {
 		p.responses = map[int]*response{}
 	}
 
 	// TODO: when what is nil, we should empty responses?
-	p.responses[status] = newResponse(status, what)
+	p.responses[status] = newResponse(status, what[0])
 	return p
 }
 

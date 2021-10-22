@@ -67,7 +67,7 @@ type Path interface {
 	QueryParams(interface{}) Path
 
 	// Response returned for given status code
-	Response(status int, what interface{}) Path
+	Response(status int, what ...interface{}) Path
 
 	// Spec returns spec compatible Paths
 	Spec() spec.Paths

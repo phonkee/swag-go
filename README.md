@@ -8,18 +8,33 @@ Simple swagger package written for my purposes
 // create service (swagger)
 service := swag.New("pat store")
 
+// now we create some structs that describe endpoint
+
+type GetPathParams struct {
+	ID int `json:"id"`
+}
+
+type PetResponse struct {
+	Name string `json:"name"`
+	Born time.Time `json:"born"`
+}
+
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 // add post method
-service.Path("/hello/world", http.MethodPost).
+service.Path("/api/v1/pets/{id}", http.MethodGet).
     // add path params
-    PathParams(PathParams{}).
+    PathParams(GetPathParams{}).
     // add query params
-    QueryParams(QueryParams{}).
+    //QueryParams(QueryParams{}).
     // add body definition
-    Body(Body{}).
+    //Body(Body{}).
     // add responses
-    Response(http.StatusOK, OkResponse{}).
-    Response(http.StatusNotFound, BaseResponse{}).
-    Response(http.StatusInternalServerError, BaseResponse{})
+    Response(http.StatusOK, PetResponse{}).
+    Response(http.StatusNotFound).
+    Response(http.StatusInternalServerError, ErrorResponse{})
 
 ```
 
