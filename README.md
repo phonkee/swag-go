@@ -87,14 +87,18 @@ type Order struct {
 
 func init() {
     // prepare prefix that identifies user by id
-	UsersOrdersApiV1 := Service.Prefix("/api/v1/users/{id}").
+	UsersOrdersApiV1 := Service.Prefix("/api/v1/users/{id}/orders").
 		PathParams(UserIdentifierPathQuery{}).
         Response(http.StatusNotFound).
         Response(http.StatusInternalServerError, ErrorResponse{})
 
 	// now get list of orders for user - path will be /api/v1/users/{id}/orders
-    UsersOrdersApiV1.Path("orders", http.MethodGet).
+    UsersOrdersApiV1.Path("", http.MethodGet).
 		Response(http.StatusOK, []Order{})
+
+	// return single order by order_id
+    UsersOrdersApiV1.Path("{order_id}", http.MethodGet).
+		Response(http.StatusOK, Order{})
 }
 
 ```
