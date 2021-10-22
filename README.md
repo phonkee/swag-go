@@ -64,6 +64,38 @@ func init() {
         QueryParams(FilterPetsQuery{}).
         Response(http.StatusOK, []Pet{})
 }
+```
+
+We have also ability to have shared common properties:
+
+```go
+ApiV1 := Service.Prefix("/api/v1/").
+	Response(http.StatusNotFound).
+	Response(http.StatusInternalServerError, ErrorResponse{})
+```
+
+And even this:
+
+```go
+type UserIdentifierPathQuery interface {
+	ID int `json:"id"`
+}
+
+type Order struct {
+	ID int `json:"id"`
+}
+
+func init() {
+    // prepare prefix that identifies user by id
+	UsersOrdersApiV1 := Service.Prefix("/api/v1/users/{id}").
+		PathParams(UserIdentifierPathQuery{}).
+        Response(http.StatusNotFound).
+        Response(http.StatusInternalServerError, ErrorResponse{})
+
+	// now get list of orders for user
+    UsersOrdersApiV1.Path("orders", http.MethodGet).
+		Response(http.StatusOK, []Order{})
+}
 
 ```
 
