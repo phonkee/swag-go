@@ -92,7 +92,7 @@ func init() {
         Response(http.StatusNotFound).
         Response(http.StatusInternalServerError, ErrorResponse{})
 
-	// now get list of orders for user
+	// now get list of orders for user - path will be /api/v1/users/{id}/orders
     UsersOrdersApiV1.Path("orders", http.MethodGet).
 		Response(http.StatusOK, []Order{})
 }
