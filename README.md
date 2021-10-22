@@ -18,11 +18,11 @@ func init() {
 }
 
 type GetPathParams struct {
-	ID int `json:"id"`
+	ID int `json:"id" swag_description:"primary key in pets database"`
 }
 
 type Pet struct {
-	ID int `json:"id"`
+	ID int `json:"id" swag_description:"unique identifier in database"`
 	Name string `json:"name"`
 	Born time.Time `json:"born"`
 }
