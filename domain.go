@@ -22,6 +22,9 @@ type Swagger interface {
 
 	// Prefix adds ability to group endpoints and have common properties (response, query params, path params)
 	Prefix(path string) Prefix
+
+	// Spec returns spec and caches it
+	Spec() *spec.Swagger
 }
 
 type PathOptions struct {

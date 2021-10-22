@@ -93,9 +93,7 @@ func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 func (s *swagger) MarshalJSON() (response []byte, err error) {
 	s.once.Do(func() {
 		// generate here
-		if s.generated, err = s.Spec(); err != nil {
-			return
-		}
+		s.generated = s.Spec()
 	})
 
 	if err != nil {
@@ -107,7 +105,7 @@ func (s *swagger) MarshalJSON() (response []byte, err error) {
 }
 
 // Spec returns spec swagger
-func (s *swagger) Spec() (*spec.Swagger, error) {
+func (s *swagger) Spec() *spec.Swagger {
 	var paths = spec.Paths{
 		VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
 		Paths:            map[string]spec.PathItem{
@@ -160,7 +158,7 @@ func (s *swagger) Spec() (*spec.Swagger, error) {
 
 	}
 
-	return &s.spec, nil
+	return &s.spec
 }
 
 func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
