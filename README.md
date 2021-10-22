@@ -77,7 +77,7 @@ ApiV1 := Service.Prefix("/api/v1/").
 And even this:
 
 ```go
-type UserIdentifierPathQuery interface {
+type UserIdentifierPathQuery struct {
 	ID int `json:"id"`
 }
 
@@ -85,11 +85,19 @@ type Order struct {
 	ID int `json:"id"`
 }
 
+type OrderCacheQueryParams struct {
+	NoCache bool `json:"no_cache"`
+}
+
 func init() {
     // prepare prefix that identifies user by id
 	UsersOrdersApiV1 := Service.Prefix("/api/v1/users/{id}/orders").
+		// path params will be inherited in all paths derived from this prefix
 		PathParams(UserIdentifierPathQuery{}).
-        Response(http.StatusNotFound).
+		// query params will be inherited in all paths derived from this prefix 
+		QueryParams(OrderCacheQueryParams{}).
+        // responses will be inherited in all paths derived from this prefix
+		Response(http.StatusNotFound).
         Response(http.StatusInternalServerError, ErrorResponse{})
 
 	// now get list of orders for user - path will be /api/v1/users/{id}/orders
