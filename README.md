@@ -50,6 +50,15 @@ service.Path("/api/v1/pets", http.MethodPost).
 	Response(http.StatusOK, PetResponse{}).
 	Response(http.StatusBadRequest, CreatePetValidationError{})
 
+
+type FilterPetsQuery struct {
+	Dogs bool `json:"dogs" swag_description:"only dogs will be returned"`
+}
+
+// now list endpoint
+service.Path("/api/v1/pets", http.MethodGet).
+    QueryParams(FilterPetsQuery{}).
+    Response(http.StatusOK, []PetResponse{})
 ```
 
 
