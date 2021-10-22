@@ -44,7 +44,7 @@ type FilterPetsQuery struct {
 }
 
 func init() {
-	// add post method
+	// add get pet by id
     Service.Path("/api/v1/pets/{id}", http.MethodGet).
         // add path params
         PathParams(GetPathParams{}).
@@ -53,13 +53,13 @@ func init() {
 		Response(http.StatusNotFound).
         Response(http.StatusInternalServerError, ErrorResponse{})
     
-    // Now create new pet endpoint
+    // create new pet endpoint
     Service.Path("/api/v1/pets", http.MethodPost).
         Body(CreatePetSerializer{}).
         Response(http.StatusOK, Pet{}).
         Response(http.StatusBadRequest, CreatePetValidationError{})
     
-    // now list endpoint
+    // list pets endpoint
     Service.Path("/api/v1/pets", http.MethodGet).
         QueryParams(FilterPetsQuery{}).
         Response(http.StatusOK, []Pet{})
