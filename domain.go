@@ -47,7 +47,7 @@ type Path interface {
 
 	// Response returned for given status code
 	// if no response is provided, no body is defined, if only nil is passed all previous responses defined will be removed)
-	Response(status int, response ...interface{}) Path
+	Response(status int, response interface{}, options ...*ResponseOptions) Path
 
 	// Spec returns spec compatible Paths
 	Spec() spec.Paths

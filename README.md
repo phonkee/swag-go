@@ -50,7 +50,7 @@ func init() {
         PathParams(GetPathParams{}).
         Response(http.StatusOK, Pet{}).
         // in this case 404 does not return any specific response
-		Response(http.StatusNotFound).
+		Response(http.StatusNotFound, nil).
         Response(http.StatusInternalServerError, ErrorResponse{})
     
     // create new pet endpoint
@@ -70,7 +70,7 @@ We have also ability to have shared common properties:
 
 ```go
 ApiV1 := Service.Prefix("/api/v1/").
-	Response(http.StatusNotFound).
+	Response(http.StatusNotFound, nil).
 	Response(http.StatusInternalServerError, ErrorResponse{})
 ```
 
@@ -97,7 +97,7 @@ func init() {
 		// query params will be inherited in all paths derived from this prefix 
 		QueryParams(OrderCacheQueryParams{}).
         // responses will be inherited in all paths derived from this prefix
-		Response(http.StatusNotFound).
+		Response(http.StatusNotFound, nil).
         Response(http.StatusInternalServerError, ErrorResponse{})
 
 	// now get list of orders for user - path will be /api/v1/users/{id}/orders
