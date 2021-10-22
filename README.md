@@ -36,6 +36,20 @@ service.Path("/api/v1/pets/{id}", http.MethodGet).
     Response(http.StatusNotFound).
     Response(http.StatusInternalServerError, ErrorResponse{})
 
+type CreatePetSerializer struct {
+	Name string `json:"name" swag_description:"Name of your pet"`
+}
+
+type CreatePetValidationError struct {
+	
+}
+
+// Now create new pet endpoint
+service.Path("/api/v1/pets", http.MethodPost).
+	Body(CreatePetSerializer{}).
+	Response(http.StatusOK, PetResponse{}).
+	Response(http.StatusBadRequest, CreatePetValidationError{})
+
 ```
 
 
