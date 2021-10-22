@@ -49,7 +49,8 @@ func init() {
         // add path params
         PathParams(GetPathParams{}).
         Response(http.StatusOK, Pet{}).
-        Response(http.StatusNotFound).
+        // in this case 404 does not return any specific response
+		Response(http.StatusNotFound).
         Response(http.StatusInternalServerError, ErrorResponse{})
     
     // Now create new pet endpoint
