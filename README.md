@@ -9,7 +9,7 @@ Simple swagger package written for my purposes
 service := swag.New("pat store")
 
 // add post method
-service.Path("/hello/world", http.MethodPost, &PathOptions{ID: "createHelloWorld"}).
+service.Path("/hello/world", http.MethodPost).
     // add path params
     PathParams(PathParams{}).
     // add query params
