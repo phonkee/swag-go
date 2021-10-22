@@ -1,6 +1,11 @@
 # swag-go
 
-Simple swagger package written for my purposes
+Simple swagger generator to be used for my purposes.
+
+####  Warning
+This library is intended to be used in `init` methods, so error handling is basically done with panic.
+If you use it differently, please think about this.
+The idea is to define all things in init, and then just serve swagger.json (or yaml) which is then cached.
 
 # example
 
