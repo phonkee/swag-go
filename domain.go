@@ -39,14 +39,15 @@ type Path interface {
 	// Body is request body
 	Body(interface{}) Path
 
-	// PathParams adds path params
+	// PathParams adds path params (if nil is provided, all params previously defined will be removed)
 	PathParams(interface{}) Path
 
-	// QueryParams params
+	// QueryParams params (if nil is provided, all params previously defined will be removed)
 	QueryParams(interface{}) Path
 
 	// Response returned for given status code
-	Response(status int, what ...interface{}) Path
+	// if no response is provided, no body is defined, if only nil is passed all previous responses defined will be removed)
+	Response(status int, response ...interface{}) Path
 
 	// Spec returns spec compatible Paths
 	Spec() spec.Paths
