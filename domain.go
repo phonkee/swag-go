@@ -7,51 +7,21 @@ import (
 	"github.com/go-openapi/spec"
 )
 
-type ContactInfo struct {
-	Name  string
-	URL   string
-	Email string
-}
-
-func (c *ContactInfo) Spec() *spec.ContactInfo {
-	if c == nil {
-		return nil
-	}
-	return &spec.ContactInfo{
-		ContactInfoProps: spec.ContactInfoProps{
-			Name:  c.Name,
-			URL:   c.URL,
-			Email: c.Email,
-		},
-	}
-}
-
-type License struct {
-	Name string
-	URL  string
-}
-
-func (l *License) Spec() *spec.License {
-	if l == nil {
-		return nil
-	}
-	return &spec.License{
-		LicenseProps: spec.LicenseProps{
-			Name: l.Name,
-			URL:  l.URL,
-		},
-	}
-}
-
 type PathProvider interface {
 	// Path adds new endpoints
 	Path(path string, method string, options ...*PathOptions) Path
 }
 
+// Swagger is main interface
+// it is returned from New call and means single service.
 type Swagger interface {
 	http.Handler
 	json.Marshaler
+
 	PathProvider
+
+	// Prefix adds ability to group endpoints and have common properties (response, query params, path params)
+	Prefix(path string) Prefix
 }
 
 type PathOptions struct {

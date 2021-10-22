@@ -69,6 +69,13 @@ type swagger struct {
 	paths       []*path
 }
 
+func (s *swagger) Prefix(pathPrefix string) Prefix {
+	return newPrefix(&prefixInfo{
+		swagger:    s,
+		pathPrefix: pathPrefix,
+	})
+}
+
 // ServeHTTP gives ability to use it in net/http
 func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	// add json header
