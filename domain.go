@@ -43,12 +43,15 @@ func (l *License) Spec() *spec.License {
 	}
 }
 
+type PathProvider interface {
+	// Path adds new endpoints
+	Path(path string, method string, options ...*PathOptions) Path
+}
+
 type Swagger interface {
 	http.Handler
 	json.Marshaler
-
-	// Path adds new endpoints
-	Path(path string, method string, options ...*PathOptions) Path
+	PathProvider
 }
 
 type PathOptions struct {
@@ -71,4 +74,18 @@ type Path interface {
 
 	// Spec returns spec compatible Paths
 	Spec() spec.Paths
+}
+
+// Prefix TODO: implement prefix in future
+type Prefix interface {
+	PathProvider
+
+	// PathParams adds path params
+	PathParams(interface{}) Path
+
+	// QueryParams params
+	QueryParams(interface{}) Path
+
+	// Response returned for given status code
+	Response(status int, what ...interface{}) Path
 }
