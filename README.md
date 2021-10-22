@@ -41,7 +41,7 @@ type CreatePetSerializer struct {
 }
 
 type CreatePetValidationError struct {
-	
+	Fields map[string]string `json:"fields"`
 }
 
 // Now create new pet endpoint
