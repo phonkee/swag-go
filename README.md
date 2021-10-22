@@ -10,11 +10,13 @@ The idea is to define all things in init, and then just serve swagger.json (or y
 # example
 
 ```go
-// package level service (so we can access it)
+// package level Service (so we can access it) from handlers
+// usually put in domain (api) package so it's accessible everywhere
 var Service swag.Swagger
 
 func init() {
-	Service = swag.New("pat store")
+	// initialize swag Swagger
+	Service = swag.New("pet store")
 }
 
 type GetPathParams struct {
