@@ -10,10 +10,12 @@ The idea is to define all things in init, and then just serve swagger.json (or y
 # example
 
 ```go
-// create service (swagger)
-service := swag.New("pat store")
+// package level service (so we can access it)
+var Service swag.Swagger
 
-// now we create some structs that describe endpoint
+func init() {
+	Service = swag.New("pat store")
+}
 
 type GetPathParams struct {
 	ID int `json:"id"`
@@ -29,14 +31,6 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-// add post method
-service.Path("/api/v1/pets/{id}", http.MethodGet).
-    // add path params
-    PathParams(GetPathParams{}).
-    Response(http.StatusOK, Pet{}).
-    Response(http.StatusNotFound).
-    Response(http.StatusInternalServerError, ErrorResponse{})
-
 type CreatePetSerializer struct {
 	Name string `json:"name" swag_description:"Name of your pet"`
 }
@@ -45,21 +39,31 @@ type CreatePetValidationError struct {
 	Fields map[string]string `json:"fields"`
 }
 
-// Now create new pet endpoint
-service.Path("/api/v1/pets", http.MethodPost).
-	Body(CreatePetSerializer{}).
-	Response(http.StatusOK, Pet{}).
-	Response(http.StatusBadRequest, CreatePetValidationError{})
-
-
 type FilterPetsQuery struct {
 	Dogs bool `json:"dogs" swag_description:"only dogs will be returned"`
 }
 
-// now list endpoint
-service.Path("/api/v1/pets", http.MethodGet).
-    QueryParams(FilterPetsQuery{}).
-    Response(http.StatusOK, []Pet{})
+func init() {
+	// add post method
+    Service.Path("/api/v1/pets/{id}", http.MethodGet).
+        // add path params
+        PathParams(GetPathParams{}).
+        Response(http.StatusOK, Pet{}).
+        Response(http.StatusNotFound).
+        Response(http.StatusInternalServerError, ErrorResponse{})
+    
+    // Now create new pet endpoint
+    Service.Path("/api/v1/pets", http.MethodPost).
+        Body(CreatePetSerializer{}).
+        Response(http.StatusOK, Pet{}).
+        Response(http.StatusBadRequest, CreatePetValidationError{})
+    
+    // now list endpoint
+    Service.Path("/api/v1/pets", http.MethodGet).
+        QueryParams(FilterPetsQuery{}).
+        Response(http.StatusOK, []Pet{})
+}
+
 ```
 
 
