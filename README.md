@@ -14,7 +14,8 @@ type GetPathParams struct {
 	ID int `json:"id"`
 }
 
-type PetResponse struct {
+type Pet struct {
+	ID int `json:"id"`
 	Name string `json:"name"`
 	Born time.Time `json:"born"`
 }
@@ -27,7 +28,7 @@ type ErrorResponse struct {
 service.Path("/api/v1/pets/{id}", http.MethodGet).
     // add path params
     PathParams(GetPathParams{}).
-    Response(http.StatusOK, PetResponse{}).
+    Response(http.StatusOK, Pet{}).
     Response(http.StatusNotFound).
     Response(http.StatusInternalServerError, ErrorResponse{})
 
@@ -42,7 +43,7 @@ type CreatePetValidationError struct {
 // Now create new pet endpoint
 service.Path("/api/v1/pets", http.MethodPost).
 	Body(CreatePetSerializer{}).
-	Response(http.StatusOK, PetResponse{}).
+	Response(http.StatusOK, Pet{}).
 	Response(http.StatusBadRequest, CreatePetValidationError{})
 
 
@@ -53,7 +54,7 @@ type FilterPetsQuery struct {
 // now list endpoint
 service.Path("/api/v1/pets", http.MethodGet).
     QueryParams(FilterPetsQuery{}).
-    Response(http.StatusOK, []PetResponse{})
+    Response(http.StatusOK, []Pet{})
 ```
 
 
