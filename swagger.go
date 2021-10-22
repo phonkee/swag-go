@@ -56,6 +56,7 @@ func New(title string, options ...*Options) Swagger {
 		},
 		options:     opts,
 		definitions: make(spec.Definitions),
+		paths:       make([]*path, 0),
 	}
 }
 
@@ -65,6 +66,7 @@ type swagger struct {
 	definitions spec.Definitions
 	once        resync.Once
 	generated   *spec.Swagger
+	paths       []*path
 }
 
 // ServeHTTP gives ability to use it in net/http
@@ -100,24 +102,56 @@ func (s *swagger) MarshalJSON() (response []byte, err error) {
 // Spec returns spec swagger
 func (s *swagger) Spec() (*spec.Swagger, error) {
 	var paths = spec.Paths{
-		VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": "swag-go"}},
-		Paths: map[string]spec.PathItem{
-			"/": {
-				PathItemProps: spec.PathItemProps{
-					Get: spec.NewOperation("what").WithTags().WithID("getThing"),
-					//Put:        nil,
-					//Post:       nil,
-					//Delete:     nil,
-					//Options:    nil,
-					//Head:       nil,
-					//Patch:      nil,
-					//Parameters: nil,
-				},
-				//Refable: spec.Refable{Ref: spec.MustCreateRef("cats")},
-			},
+		VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
+		Paths:            map[string]spec.PathItem{
+			//"/": {
+			//	PathItemProps: spec.PathItemProps{
+			//		Get: spec.NewOperation("what").WithTags().WithID("getThing"),
+			//		//Put:        nil,
+			//		//Post:       nil,
+			//		//Delete:     nil,
+			//		//Options:    nil,
+			//		//Head:       nil,
+			//		//Patch:      nil,
+			//		//Parameters: nil,
+			//	},
+			//	//Refable: spec.Refable{Ref: spec.MustCreateRef("cats")},
+			//},
 		},
 	}
 	s.spec.Paths = &paths
+
+	for _, p := range s.paths {
+		for k, v := range p.Spec().Paths {
+			if _, ok := s.spec.Paths.Paths[k]; !ok {
+				s.spec.Paths.Paths[k] = spec.PathItem{
+					PathItemProps: spec.PathItemProps{
+						Parameters: []spec.Parameter{},
+					},
+				}
+			}
+
+			where := s.spec.Paths.Paths[k]
+
+			for _, def := range []struct {
+				from *spec.Operation
+				to   *spec.Operation
+			}{
+				{v.Get, where.Get},
+				{v.Post, where.Post},
+				{v.Put, where.Put},
+				{v.Patch, where.Patch},
+				{v.Options, where.Options},
+				{v.Delete, where.Delete},
+				{v.Head, where.Head},
+			} {
+				if def.from != nil {
+					def.to = def.from
+				}
+			}
+		}
+
+	}
 
 	return &s.spec, nil
 }
@@ -131,11 +165,14 @@ func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
 		opts = options[0]
 	}
 
-	return newPath(&pathInfo{
+	np := newPath(&pathInfo{
 		Path:        p,
 		Method:      method,
 		Definitions: s.definitions,
 		Options:     opts,
 		Invalidate:  func() { s.once.Reset() },
 	})
+	s.paths = append(s.paths, np)
+
+	return np
 }

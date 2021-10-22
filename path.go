@@ -1,13 +1,20 @@
 package swag
 
 import (
-	fmt2 "fmt"
+	"fmt"
 	"reflect"
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/fatih/structs"
 	"github.com/go-openapi/spec"
+)
+
+type paramType string
+
+const (
+	ParamTypeQuery paramType = "query"
+	ParamTypePath  paramType = "path"
 )
 
 type pathInfo struct {
@@ -52,14 +59,10 @@ func (p *path) Body(i interface{}) Path {
 	return p
 }
 
-type response struct {
-	schema *spec.Schema
-}
-
 // PathParams adds path params
 func (p *path) PathParams(i interface{}) Path {
 	p.invalidate()
-	for _, param := range p.Params(i, spec.PathParam) {
+	for _, param := range p.Params(i, ParamTypePath) {
 		p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *param)
 	}
 
@@ -69,13 +72,13 @@ func (p *path) PathParams(i interface{}) Path {
 // QueryParams adds query params
 func (p *path) QueryParams(i interface{}) Path {
 	p.invalidate()
-	for _, param := range p.Params(i, spec.QueryParam) {
+	for _, param := range p.Params(i, ParamTypeQuery) {
 		spew.Dump(param)
 	}
 	return p
 }
 
-func (p *path) Params(i interface{}, nf func(name string) *spec.Parameter) []*spec.Parameter {
+func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 	result := make([]*spec.Parameter, 0)
 	ss := structs.New(i)
 	for index, field := range ss.Fields() {
@@ -87,18 +90,26 @@ func (p *path) Params(i interface{}, nf func(name string) *spec.Parameter) []*sp
 				name = jsonName
 			}
 		}
-		param := nf(name).WithDescription(description)
+
+		var format *spec.Parameter
+
+		switch typ {
+		case ParamTypeQuery:
+			format = spec.QueryParam(name).WithDescription(description)
+		case ParamTypePath:
+			format = spec.PathParam(name).WithDescription(description)
+		}
 
 		// get kind
 		kind := field.Kind()
 
 		if kind == reflect.Ptr {
-			param.Required = false
+			format.Required = false
 			// not nice, but not accessible from field
 			kind = reflect.TypeOf(i).Field(index).Type.Elem().Kind()
 		}
 
-		var typ, fmt string
+		var typ, tmpFmt string
 		// now type switch for types
 		// TODO: finish https://github.com/OAI/OpenAPI-Specification/blob/main/versions/2.0.md#data-types
 		switch kind {
@@ -108,33 +119,48 @@ func (p *path) Params(i interface{}, nf func(name string) *spec.Parameter) []*sp
 			typ = "integer"
 		case reflect.Float32:
 			typ = "number"
-			fmt = "float"
+			tmpFmt = "float"
 		case reflect.Float64:
 			typ = "number"
-			fmt = "double"
+			tmpFmt = "double"
 		case reflect.String:
 			typ = "string"
 		default:
-			panic(fmt2.Sprintf("unsupported kind %v", kind.String()))
+			panic(fmt.Sprintf("unsupported kind %v", kind.String()))
 		}
 
-		param.SimpleSchema.Type = typ
-		param.SimpleSchema.Format = fmt
+		format.SimpleSchema.Type = typ
+		format.SimpleSchema.Format = tmpFmt
 
-		result = append(result, param)
+		p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *format)
+
+		result = append(result, format)
 	}
 
 	return result
 }
 
+// Response adds response to path
 func (p *path) Response(status int, what interface{}) Path {
 	p.invalidate()
-	//_ = p.components.GetSchema(what)
+	if what == nil {
+		p.responses = map[int]*response{}
+	}
+
+	// TODO: when what is nil, we should empty responses?
+	p.responses[status] = newResponse(status, what)
 	return p
 }
 
 func (p *path) Spec() spec.Paths {
-	return spec.Paths{
-		Paths: map[string]spec.PathItem{},
+
+	// now add all responses to item
+
+	result := spec.Paths{
+		Paths: map[string]spec.PathItem{
+			p.path: p.item,
+		},
 	}
+
+	return result
 }
