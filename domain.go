@@ -28,8 +28,6 @@ type Swagger interface {
 
 	// Spec returns spec and caches it
 	Spec() *spec.Swagger
-
-	// private methods
 }
 
 type PathOptions struct {
