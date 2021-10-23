@@ -16,6 +16,14 @@ type prefix struct {
 	info *prefixInfo
 }
 
+func (p *prefix) FlushResponses() Prefix {
+	return p
+}
+
+func (p *prefix) Prefix(path string) Prefix {
+	panic("implement me")
+}
+
 func (p *prefix) Path(path string, method string, options ...*PathOptions) Path {
 	panic("implement me")
 }

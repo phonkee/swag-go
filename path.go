@@ -17,6 +17,8 @@ const (
 	ParamTypePath  paramType = "path"
 )
 
+type blankResponse int
+
 type pathInfo struct {
 	Path        string
 	Method      string
@@ -52,6 +54,10 @@ type path struct {
 	invalidate  func()
 	item        spec.PathItem
 	swagger     Swagger
+}
+
+func (p *path) FlushResponses() Path {
+	return p
 }
 
 func (p *path) Body(i interface{}) Path {
