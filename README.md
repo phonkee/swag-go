@@ -88,7 +88,7 @@ type Order struct {
 }
 
 type OrderCacheQueryParams struct {
-	NoCache bool `json:"no_cache"`
+	NoCache bool `json:"no_cache" swag_description:"when true, orders will be fetched from database"`
 }
 
 func init() {
