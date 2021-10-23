@@ -77,12 +77,14 @@ func TestInspectSchema(t *testing.T) {
 	t.Run("test valid schema", func(t *testing.T) {
 		type Response struct {
 			Some  int
-			Other []int
+			Other []int `json:"other"`
 		}
 
 		defs := spec.Definitions{}
 		schema := inspectSchema(Response{}, defs)
 		assert.NotNil(t, schema)
+		assert.Equal(t, schema.Properties["Some"].ID, "Some")
+		assert.Equal(t, schema.Properties["other"].ID, "other")
 	})
 
 	t.Run("test top level array", func(t *testing.T) {

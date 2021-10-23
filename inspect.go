@@ -122,6 +122,7 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 			fsch := inspectSchema(field.Value(), defs)
 			name := getFieldName(field)
 			if fsch != nil {
+				fsch.ID = name
 				fsch.Description = getFieldDescription(field)
 				result.Properties[name] = *fsch
 			}
