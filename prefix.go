@@ -1,7 +1,5 @@
 package swag
 
-import "github.com/go-openapi/spec"
-
 type prefixInfo struct {
 	swagger    *swagger
 	pathPrefix string
@@ -28,26 +26,17 @@ func (p *prefix) Path(path string, method string, options ...*PathOptions) Path 
 	panic("implement me")
 }
 
-func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Path {
+func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Prefix {
 	p.info.resetCache()
 	panic("implement me")
 }
 
-func (p *prefix) Body(i interface{}) Path {
+func (p *prefix) PathParams(i interface{}) Prefix {
 	p.info.resetCache()
 	panic("implement me")
 }
 
-func (p *prefix) PathParams(i interface{}) Path {
+func (p *prefix) QueryParams(i interface{}) Prefix {
 	p.info.resetCache()
-	panic("implement me")
-}
-
-func (p *prefix) QueryParams(i interface{}) Path {
-	p.info.resetCache()
-	panic("implement me")
-}
-
-func (p *prefix) Spec() spec.Paths {
 	panic("implement me")
 }

@@ -62,11 +62,11 @@ type Prefix interface {
 	PrefixProvider
 
 	// PathParams adds path params
-	PathParams(interface{}) Path
+	PathParams(interface{}) Prefix
 
 	// QueryParams params
-	QueryParams(interface{}) Path
+	QueryParams(interface{}) Prefix
 
 	// Response returned for given status code
-	Response(status int, response interface{}, options ...*ResponseOptions) Path
+	Response(status int, response interface{}, options ...*ResponseOptions) Prefix
 }
