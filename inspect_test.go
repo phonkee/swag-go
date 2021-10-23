@@ -18,7 +18,7 @@ func TestInspectParams(t *testing.T) {
 		inspected := inspectParams(Some{}, spec.QueryParam)
 		assert.NotNil(t, inspected)
 		assert.Equal(t, inspected[0].In, "query")
-		assert.True(t, len(inspected) == 2)
+		assert.True(t, len(inspected) == 3)
 		assert.True(t, inspected[0].Name == "Param1")
 		assert.True(t, inspected[0].Type == "string")
 
@@ -33,7 +33,16 @@ func TestInspectParams(t *testing.T) {
 		assert.Equal(t, inspected[0].In, "path")
 	})
 
-	t.Run("sub structs naming", func(t *testing.T) {
+	t.Run("test required", func(t *testing.T) {
+		type Some struct {
+			NonRequired *int
+		}
+		inspected := inspectParams(Some{}, spec.QueryParam)
+		assert.NotNil(t, inspected)
+		assert.True(t, inspected[0].Required == false)
+	})
+
+	t.Run("sub structs naming with dots", func(t *testing.T) {
 		type Second struct {
 			Second1 string
 			Second2 int `json:"second2"`
@@ -55,5 +64,4 @@ func TestInspectParams(t *testing.T) {
 		assert.Equal(t, "third.Third1", inspected[2].Name)
 		assert.Equal(t, "third.third2", inspected[3].Name)
 	})
-
 }

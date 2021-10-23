@@ -68,3 +68,8 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 
 	return result
 }
+
+// inspectSchema inspects target and returns Schema
+func inspectSchema(target interface{}) (*spec.Schema, error) {
+	return nil, nil
+}
