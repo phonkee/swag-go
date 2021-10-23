@@ -46,7 +46,7 @@ type FilterPetsQuery struct {
 }
 
 func init() {
-	// add get pet by id
+	// get single pet by id
     Service.Path("/api/v1/pets/{id}", http.MethodGet).
         // add path params
         PathParams(GetPathParams{}).
