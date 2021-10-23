@@ -73,6 +73,9 @@ func (s *swagger) Prefix(pathPrefix string) Prefix {
 	return newPrefix(&prefixInfo{
 		swagger:    s,
 		pathPrefix: pathPrefix,
+		resetCache: func() {
+			s.once.Reset()
+		},
 	})
 }
 

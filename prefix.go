@@ -3,11 +3,13 @@ package swag
 import "github.com/go-openapi/spec"
 
 type prefixInfo struct {
-	swagger    Swagger
+	swagger    *swagger
 	pathPrefix string
+	resetCache func()
 }
 
 func newPrefix(info *prefixInfo) Prefix {
+	info.resetCache()
 	return &prefix{info: info}
 }
 
@@ -17,26 +19,32 @@ type prefix struct {
 }
 
 func (p *prefix) Prefix(path string) Prefix {
+	p.info.resetCache()
 	panic("implement me")
 }
 
 func (p *prefix) Path(path string, method string, options ...*PathOptions) Path {
+	p.info.resetCache()
 	panic("implement me")
 }
 
 func (p *prefix) Response(status int, what ...interface{}) Path {
+	p.info.resetCache()
 	panic("implement me")
 }
 
 func (p *prefix) Body(i interface{}) Path {
+	p.info.resetCache()
 	panic("implement me")
 }
 
 func (p *prefix) PathParams(i interface{}) Path {
+	p.info.resetCache()
 	panic("implement me")
 }
 
 func (p *prefix) QueryParams(i interface{}) Path {
+	p.info.resetCache()
 	panic("implement me")
 }
 

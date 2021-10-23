@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/fatih/structs"
 	"github.com/go-openapi/spec"
 )
@@ -75,7 +74,8 @@ func (p *path) PathParams(i interface{}) Path {
 func (p *path) QueryParams(i interface{}) Path {
 	p.invalidate()
 	for _, param := range p.Params(i, ParamTypeQuery) {
-		spew.Dump(param)
+		_ = param
+		// spew.Dump(param)
 	}
 	return p
 }
@@ -84,7 +84,7 @@ func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 	result := make([]*spec.Parameter, 0)
 	ss := structs.New(i)
 	for index, field := range ss.Fields() {
-		description := field.Tag("swag_description")
+		description := getFieldDescription(field)
 		name := field.Name()
 		if jsonName := field.Tag("json"); jsonName != "" {
 			splitted := strings.SplitN(jsonName, ",", 2)

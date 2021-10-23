@@ -53,12 +53,7 @@ func TestNew(t *testing.T) {
 		Response(http.StatusNotFound, BaseResponse{}).
 		Response(http.StatusInternalServerError, BaseResponse{})
 
-	// Future: Prefix returns path prefix where we can set common Response, PathParams, QueryParams for all Path that
-	// are created from it
-	// api := swg.Prefix("/api/v1").Response(http.StatusInternalServerError, BaseResponse{})
-	// api.Path("user", http.MethodGet)
-
 	b, err := json.Marshal(swg)
 	assert.NoError(t, err)
-	println(string(b))
+	_ = b
 }
