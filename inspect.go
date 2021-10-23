@@ -14,7 +14,7 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 	result := make([]*spec.Parameter, 0)
 	ss := structs.New(target)
 	for index, field := range ss.Fields() {
-		description := field.Tag("swag_description")
+		description := getFieldDescription(field)
 		name := field.Name()
 		if jsonName := field.Tag("json"); jsonName != "" {
 			splitted := strings.SplitN(jsonName, ",", 2)
@@ -132,7 +132,7 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 	case reflect.Slice, reflect.Array:
 		sch := &spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Type:     []string{"array"},
+				Type: []string{"array"},
 			},
 		}
 
