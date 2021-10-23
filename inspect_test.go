@@ -116,9 +116,9 @@ func TestInspectSchema(t *testing.T) {
 		assert.NotNil(t, x)
 		assert.Equal(t, "swag.Response", x.Items.Schema.Ref.String())
 		assert.Equal(t, 2, len(x.Items.Schema.Properties))
-		assert.Equal(t, 1, len(x.Items.Schema.Properties["Some"].Properties))
-		assert.Equal(t, 1, len(x.Items.Schema.Properties["some2"].Properties))
-		assert.Equal(t, 1, len(x.Items.Schema.Properties["some2"].Properties["got"].ID))
+		assert.Equal(t, 1, len(x.Items.Schema.Properties["Some"].Items.Schema.Properties))
+		assert.Equal(t, 1, len(x.Items.Schema.Properties["some2"].Items.Schema.Properties))
+		assert.Equal(t, spec.StringOrArray(spec.StringOrArray{"string"}), x.Items.Schema.Properties["some2"].Items.Schema.Properties["got"].Type)
 	})
 
 }

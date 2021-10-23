@@ -132,7 +132,6 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 		sch := &spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Type:     []string{"array"},
-				Nullable: !required,
 			},
 		}
 
