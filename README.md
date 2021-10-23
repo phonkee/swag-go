@@ -19,7 +19,7 @@ func init() {
 	Service = swag.New("pet store")
 }
 
-type GetPathParams struct {
+type GetPetPathParams struct {
 	ID int `json:"id" swag_description:"primary key in pets database"`
 }
 
@@ -49,7 +49,7 @@ func init() {
 	// get single pet by id
     Service.Path("/api/v1/pets/{id}", http.MethodGet).
         // add path params
-        PathParams(GetPathParams{}).
+        PathParams(GetPetPathParams{}).
         Response(http.StatusOK, Pet{}).
         // in this case 404 does not return any specific response
 		Response(http.StatusNotFound, nil).
