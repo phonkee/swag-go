@@ -56,10 +56,6 @@ type path struct {
 	swagger     Swagger
 }
 
-func (p *path) FlushResponses() Path {
-	return p
-}
-
 func (p *path) Body(i interface{}) Path {
 	p.invalidate()
 	return p

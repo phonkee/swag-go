@@ -52,8 +52,6 @@ type Path interface {
 	// if no response is provided, no body is defined, if only nil is passed all previous responses defined will be removed)
 	Response(status int, response interface{}, options ...*ResponseOptions) Path
 
-	FlushResponses() Path
-
 	// Spec returns spec compatible Paths
 	Spec() spec.Paths
 }
@@ -62,8 +60,6 @@ type Path interface {
 type Prefix interface {
 	PathProvider
 	PrefixProvider
-
-	FlushResponses() Prefix
 
 	// PathParams adds path params
 	PathParams(interface{}) Path
