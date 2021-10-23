@@ -148,7 +148,5 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 		return sch
 	}
 
-	_ = required
-
 	return
 }
