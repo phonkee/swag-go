@@ -73,37 +73,73 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 
 // inspectSchema inspects target and returns Schema
 func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Schema) {
-
+	required := true
 	typ := reflect.TypeOf(target)
-	// first check for slice
-	if kind := typ.Kind(); kind == reflect.Slice || kind == reflect.Array {
-		println("this is array")
 
-		result = &spec.Schema{
+	if typ.Kind() == reflect.Ptr {
+		required = false
+		typ = typ.Elem()
+	}
+
+	switch typ.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return &spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				AllOf: []spec.Schema{},
+				Type:     []string{"integer"},
+				Nullable: !required,
+			},
+		}
+	case reflect.String:
+		return &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type:     []string{"string"},
+				Nullable: !required,
+			},
+		}
+	case reflect.Bool:
+		return &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type:     []string{"boolean"},
+				Nullable: !required,
+			},
+		}
+	case reflect.Struct:
+		id := fmt.Sprintf("%T", target)
+		if r, ok := defs[id]; ok {
+			return &r
+		}
+
+		result = spec.RefSchema(id)
+		result.ID = id
+		result.Properties = spec.SchemaProperties{}
+		result.Nullable = !required
+		for _, field := range structs.New(target).Fields() {
+			if !isFieldAvailable(field) {
+				continue
+			}
+			fsch := inspectSchema(field.Value(), defs)
+			name := getFieldName(field)
+			if fsch != nil {
+				fsch.Description = getFieldDescription(field)
+				result.Properties[name] = *fsch
+			}
+		}
+		return result
+	case reflect.Slice, reflect.Array:
+		sch := &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type:     []string{"array"},
+				Nullable: !required,
 			},
 		}
 
-		return
+		sch.Items = &spec.SchemaOrArray{
+			Schema: inspectSchema(reflect.New(reflect.TypeOf(target).Elem()).Interface(), defs),
+		}
+
+		return sch
 	}
 
-	ss := structs.New(target)
-
-	typString := fmt.Sprintf("%T", target)
-	println(typString)
-
-	if _, ok := defs[typString]; ok {
-		return spec.RefSchema(typString)
-	}
-
-	for index, field := range ss.Fields() {
-		_ = index
-		_ = field
-
-
-
-	}
-
-	return
+	return nil
 }

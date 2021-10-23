@@ -3,7 +3,6 @@ package swag
 import (
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-openapi/spec"
 	"github.com/stretchr/testify/assert"
 )
@@ -91,22 +90,37 @@ func TestInspectSchema(t *testing.T) {
 
 	t.Run("test valid schema", func(t *testing.T) {
 		type Response struct {
-			Some []int
+			Some  int
+			Other []int
 		}
 
 		defs := spec.Definitions{}
-		ref := inspectSchema(Response{}, defs)
-		spew.Dump(ref)
+		schema := inspectSchema(Response{}, defs)
+		assert.NotNil(t, schema)
 	})
 
 	t.Run("test top level array", func(t *testing.T) {
+		type Inner struct {
+			Got string
+		}
+		type Inner2 struct {
+			Got string `json:"got"`
+		}
 		type Response struct {
-			Some []int
+			Some  []Inner
+			Some2 []Inner2 `json:"some2"`
 		}
 
 		defs := spec.Definitions{}
-		ref := inspectSchema([]Response{}, defs)
-		_ = ref
+		schema := inspectSchema([]Response{}, defs)
+
+		x := defs[schema.Ref.String()]
+		assert.NotNil(t, x)
+		assert.Equal(t, x.Type, "object")
+		assert.Equal(t, len(x.Properties), 2)
+		assert.Equal(t, len(x.Properties["Some"].Properties), 1)
+		assert.Equal(t, len(x.Properties["some2"].Properties), 1)
+		assert.Equal(t, len(x.Properties["some2"].Properties["got"].ID), "got")
 	})
 
 }
