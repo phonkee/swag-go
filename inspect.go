@@ -52,7 +52,9 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 			typ = "string"
 		case reflect.Struct:
 			for _, subParam := range inspectParams(field.Value(), fn) {
-				subParam.Name = fmt.Sprintf("%v.%v", name, subParam.Name)
+				if !field.IsEmbedded() {
+					subParam.Name = fmt.Sprintf("%v.%v", name, subParam.Name)
+				}
 				result = append(result, subParam)
 			}
 			continue
@@ -70,6 +72,38 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 }
 
 // inspectSchema inspects target and returns Schema
-func inspectSchema(target interface{}) (*spec.Schema, error) {
-	return nil, nil
+func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Schema) {
+
+	typ := reflect.TypeOf(target)
+	// first check for slice
+	if kind := typ.Kind(); kind == reflect.Slice || kind == reflect.Array {
+		println("this is array")
+
+		result = &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				AllOf: []spec.Schema{},
+			},
+		}
+
+		return
+	}
+
+	ss := structs.New(target)
+
+	typString := fmt.Sprintf("%T", target)
+	println(typString)
+
+	if _, ok := defs[typString]; ok {
+		return spec.RefSchema(typString)
+	}
+
+	for index, field := range ss.Fields() {
+		_ = index
+		_ = field
+
+
+
+	}
+
+	return
 }
