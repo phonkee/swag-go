@@ -37,7 +37,7 @@ type CreatePetSerializer struct {
 	Name string `json:"name" swag_description:"Name of your pet"`
 }
 
-type CreatePetValidationError struct {
+type FieldValidationError struct {
 	Fields map[string]string `json:"fields"`
 }
 
@@ -59,7 +59,7 @@ func init() {
     Service.Path("/api/v1/pets", http.MethodPost).
         Body(CreatePetSerializer{}).
         Response(http.StatusOK, Pet{}).
-        Response(http.StatusBadRequest, CreatePetValidationError{})
+        Response(http.StatusBadRequest, FieldValidationError{})
     
     // list pets endpoint
     Service.Path("/api/v1/pets", http.MethodGet).
