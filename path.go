@@ -29,40 +29,30 @@ type pathInfo struct {
 
 func newPath(info *pathInfo) *path {
 	return &path{
-		definitions: info.Definitions,
-		path:        info.Path,
-		method:      info.Method,
-		options:     info.Options,
-		responses:   map[int]*response{},
-		invalidate:  info.Invalidate,
+		info:      info,
+		responses: map[int]*response{},
 		item: spec.PathItem{
 			PathItemProps: spec.PathItemProps{
 				Parameters: []spec.Parameter{},
 			},
 		},
-		swagger: info.Swagger,
 	}
 }
 
 type path struct {
-	path        string
-	method      string
-	definitions spec.Definitions
-	options     *PathOptions
-	responses   map[int]*response
-	invalidate  func()
-	item        spec.PathItem
-	swagger     Swagger
+	responses map[int]*response
+	item      spec.PathItem
+	info      *pathInfo
 }
 
 func (p *path) Body(i interface{}) Path {
-	p.invalidate()
+	p.info.Invalidate()
 	return p
 }
 
 // PathParams adds path params
 func (p *path) PathParams(i interface{}) Path {
-	p.invalidate()
+	p.info.Invalidate()
 	for _, param := range p.Params(i, ParamTypePath) {
 		p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *param)
 	}
@@ -72,7 +62,7 @@ func (p *path) PathParams(i interface{}) Path {
 
 // QueryParams adds query params
 func (p *path) QueryParams(i interface{}) Path {
-	p.invalidate()
+	p.info.Invalidate()
 	for _, param := range p.Params(i, ParamTypeQuery) {
 		_ = param
 		// spew.Dump(param)
@@ -144,7 +134,7 @@ func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 
 // Response adds response to path
 func (p *path) Response(status int, what interface{}, options ...*ResponseOptions) Path {
-	p.invalidate()
+	p.info.Invalidate()
 
 	var opts *ResponseOptions
 
@@ -166,10 +156,11 @@ func (p *path) Response(status int, what interface{}, options ...*ResponseOption
 func (p *path) Spec() spec.Paths {
 
 	// now add all responses to item
+	// TODO: finish this
 
 	result := spec.Paths{
 		Paths: map[string]spec.PathItem{
-			p.path: p.item,
+			p.info.Path: p.item,
 		},
 	}
 

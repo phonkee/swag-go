@@ -60,15 +60,60 @@ func New(title string, options ...*Options) Swagger {
 	}
 }
 
+// swagger implementation of Swagger
 type swagger struct {
 	spec        spec.Swagger
 	options     *Options
 	definitions spec.Definitions
 	once        resync.Once
-	generated   *spec.Swagger
+	generated   []byte
 	paths       []*path
 }
 
+func (s *swagger) addPath(p *path) {
+	s.paths = append(s.paths, p)
+}
+
+// MarshalJSON marshals into json and caches result
+func (s *swagger) MarshalJSON() (response []byte, err error) {
+	s.once.Do(func() {
+		// if not generated or changed, do that now
+		s.generated, err = json.Marshal(s.generated)
+	})
+
+	if err != nil {
+		return
+	}
+
+	return s.generated, nil
+}
+
+// Path returns path
+func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
+	// reset generated thing
+	s.once.Reset()
+
+	var opts *PathOptions
+	if len(options) > 0 && options[0] != nil {
+		opts = options[0]
+	}
+
+	np := newPath(&pathInfo{
+		Path:        p,
+		Method:      method,
+		Definitions: s.definitions,
+		Options:     opts,
+		Invalidate:  func() { s.once.Reset() },
+		Swagger:     s,
+	})
+
+	// add path to swagger
+	s.addPath(np)
+
+	return np
+}
+
+// Prefix returns prefixed prefix
 func (s *swagger) Prefix(pathPrefix string) Prefix {
 	return newPrefix(&prefixInfo{
 		swagger:    s,
@@ -89,22 +134,8 @@ func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// MarshalJSON marshals into json and caches result
-func (s *swagger) MarshalJSON() (response []byte, err error) {
-	s.once.Do(func() {
-		// generate here
-		s.generated = s.Spec()
-	})
-
-	if err != nil {
-		return
-	}
-
-	response, err = json.Marshal(s.generated)
-	return
-}
-
 // Spec returns spec swagger
+// TODO: finish this
 func (s *swagger) Spec() *spec.Swagger {
 	var paths = spec.Paths{
 		VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
@@ -155,30 +186,7 @@ func (s *swagger) Spec() *spec.Swagger {
 				}
 			}
 		}
-
 	}
 
 	return &s.spec
-}
-
-func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
-	// reset generated thing
-	s.once.Reset()
-
-	var opts *PathOptions
-	if len(options) > 0 && options[0] != nil {
-		opts = options[0]
-	}
-
-	np := newPath(&pathInfo{
-		Path:        p,
-		Method:      method,
-		Definitions: s.definitions,
-		Options:     opts,
-		Invalidate:  func() { s.once.Reset() },
-		Swagger:     s,
-	})
-	s.paths = append(s.paths, np)
-
-	return np
 }
