@@ -68,5 +68,5 @@ type Prefix interface {
 	QueryParams(interface{}) Path
 
 	// Response returned for given status code
-	Response(status int, what ...interface{}) Path
+	Response(status int, response interface{}, options ...*ResponseOptions) Path
 }

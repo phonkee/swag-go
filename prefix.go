@@ -28,7 +28,7 @@ func (p *prefix) Path(path string, method string, options ...*PathOptions) Path 
 	panic("implement me")
 }
 
-func (p *prefix) Response(status int, what ...interface{}) Path {
+func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Path {
 	p.info.resetCache()
 	panic("implement me")
 }
