@@ -74,20 +74,6 @@ func TestInspectParams(t *testing.T) {
 }
 
 func TestInspectSchema(t *testing.T) {
-	//t.Run("test invalid schema", func(t *testing.T) {
-	//	invalid := []interface{}{
-	//		1,
-	//		true,
-	//		nil,
-	//	}
-	//	for _, item := range invalid {
-	//		defs := spec.Definitions{}
-	//		assert.Panics(t, func() {
-	//			inspectSchema(item, defs)
-	//		})
-	//	}
-	//})
-
 	t.Run("test valid schema", func(t *testing.T) {
 		type Response struct {
 			Some  int
