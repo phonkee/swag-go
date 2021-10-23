@@ -1,11 +1,15 @@
 package swag
 
+import "strings"
+
 type ResponseOptions struct {
-	Description string `json:"description"`
+	Description string
+	// Headers is any structure with fields
+	Headers interface{}
 }
 
 func (r *ResponseOptions) Defaults() {
-
+	r.Description = strings.TrimSpace(r.Description)
 }
 
 type response struct {

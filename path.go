@@ -117,6 +117,8 @@ func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 			tmpFmt = "double"
 		case reflect.String:
 			typ = "string"
+		case reflect.Bool:
+			typ = "boolean"
 		default:
 			panic(fmt.Sprintf("unsupported kind %v", kind.String()))
 		}
@@ -156,7 +158,7 @@ func (p *path) Response(status int, what interface{}, options ...*ResponseOption
 func (p *path) Spec() spec.Paths {
 
 	// now add all responses to item
-	// TODO: finish this
+	// TODO: now we need to merge here things, and return correct things
 
 	result := spec.Paths{
 		Paths: map[string]spec.PathItem{

@@ -7,6 +7,12 @@ import (
 	"github.com/go-openapi/spec"
 )
 
+type PathOptions struct {
+	Description string
+	ID          string
+	Tags        []string
+}
+
 type PathProvider interface {
 	// Path adds new endpoints
 	Path(path string, method string, options ...*PathOptions) Path
@@ -31,12 +37,6 @@ type Swagger interface {
 
 	// private methods
 	addPath(*path)
-}
-
-type PathOptions struct {
-	Description string
-	ID          string
-	Tags        []string
 }
 
 type Path interface {
