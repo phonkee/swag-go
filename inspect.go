@@ -111,9 +111,16 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 		}
 
 		result = spec.RefSchema(id)
-		result.ID = id
-		result.Properties = spec.SchemaProperties{}
-		result.Nullable = !required
+
+		point := spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				ID:         id,
+				Properties: spec.SchemaProperties{},
+				Nullable:   !required,
+			},
+			SwaggerSchemaProps: spec.SwaggerSchemaProps{},
+			ExtraProps:         nil,
+		}
 		for _, field := range structs.New(target).Fields() {
 			if !isFieldAvailable(field) {
 				continue
@@ -122,9 +129,10 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 			name := getFieldName(field)
 			if fsch != nil {
 				fsch.Description = getFieldDescription(field)
-				result.Properties[name] = *fsch
+				point.Properties[name] = *fsch
 			}
 		}
+		defs[id] = point
 		return result
 	case reflect.Slice, reflect.Array:
 		sch := &spec.Schema{
