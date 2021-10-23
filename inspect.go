@@ -136,12 +136,14 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 			},
 		}
 
-		sch.Items = &spec.SchemaOrArray{
-			Schema: inspectSchema(reflect.New(reflect.TypeOf(target).Elem()).Interface(), defs),
+		elem := reflect.TypeOf(target).Elem()
+		if elem.Kind() == reflect.Ptr {
+			elem = elem.Elem()
 		}
 
-
-
+		sch.Items = &spec.SchemaOrArray{
+			Schema: inspectSchema(reflect.New(elem).Interface(), defs),
+		}
 
 		return sch
 	}
