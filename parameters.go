@@ -17,9 +17,9 @@ func init() {
 	paramIntFunc := func(parameter *spec.Parameter, p reflect.Type) {
 		parameter.Type = "integer"
 	}
-	globalParameters.RegisterParameter(paramIntFunc, reflect.TypeOf(int(0)), reflect.TypeOf(int8(0)), reflect.TypeOf(int16(0)), reflect.TypeOf(int32(0)), reflect.TypeOf(int64(0)))
-	globalParameters.RegisterParameter(paramIntFunc, reflect.TypeOf(uint(0)), reflect.TypeOf(uint8(0)), reflect.TypeOf(uint16(0)), reflect.TypeOf(uint32(0)), reflect.TypeOf(uint64(0)))
-	globalParameters.RegisterParameter(func(parameter *spec.Parameter, t reflect.Type) {
+	registerParameter(paramIntFunc, reflect.TypeOf(int(0)), reflect.TypeOf(int8(0)), reflect.TypeOf(int16(0)), reflect.TypeOf(int32(0)), reflect.TypeOf(int64(0)))
+	registerParameter(paramIntFunc, reflect.TypeOf(uint(0)), reflect.TypeOf(uint8(0)), reflect.TypeOf(uint16(0)), reflect.TypeOf(uint32(0)), reflect.TypeOf(uint64(0)))
+	registerParameter(func(parameter *spec.Parameter, t reflect.Type) {
 		switch t.Kind() {
 		case reflect.Float32:
 			parameter.Type = "number"
@@ -29,13 +29,13 @@ func init() {
 			parameter.Format = "double"
 		}
 	}, reflect.TypeOf(float32(1)), reflect.TypeOf(float64(1)))
-	globalParameters.RegisterParameter(func(parameter *spec.Parameter, r reflect.Type) {
+	registerParameter(func(parameter *spec.Parameter, r reflect.Type) {
 		parameter.Type = "string"
 	}, reflect.TypeOf(""))
 }
 
-// RegisterParameter registers parameter for given type
-func RegisterParameter(fn func(*spec.Parameter, reflect.Type), types ...reflect.Type) {
+// registerParameter registers parameter for given type
+func registerParameter(fn func(*spec.Parameter, reflect.Type), types ...reflect.Type) {
 	globalParameters.RegisterParameter(fn, types...)
 }
 
