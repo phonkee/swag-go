@@ -57,3 +57,15 @@ func TestNew(t *testing.T) {
 	assert.NoError(t, err)
 	_ = b
 }
+
+type TestParamsParams struct {
+	Str string
+}
+
+func TestParams(t *testing.T) {
+	t.Run("simple params", func(t *testing.T) {
+		swg := New("hello")
+		swg.Path("/hello", http.MethodGet).
+			PathParams(TestParamsParams{})
+	})
+}

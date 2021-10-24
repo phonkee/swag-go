@@ -8,6 +8,11 @@ import (
 	"github.com/go-openapi/spec"
 )
 
+var (
+	globalParameters     = newParameters()
+	errParameterNotFound = errors.New("parameter not found")
+)
+
 func init() {
 	paramIntFunc := func(parameter *spec.Parameter, p reflect.Type) {
 		parameter.Type = "integer"
@@ -26,13 +31,8 @@ func init() {
 	}, reflect.TypeOf(float32(1)), reflect.TypeOf(float64(1)))
 	globalParameters.RegisterParameter(func(parameter *spec.Parameter, r reflect.Type) {
 		parameter.Type = "string"
-	}, reflect.TypeOf(string("")))
+	}, reflect.TypeOf(""))
 }
-
-var (
-	globalParameters     = newParameters()
-	errParameterNotFound = errors.New("parameter not found")
-)
 
 // RegisterParameter registers parameter for given type
 func RegisterParameter(fn func(*spec.Parameter, reflect.Type), types ...reflect.Type) {

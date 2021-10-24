@@ -1,6 +1,7 @@
 package swag
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -30,6 +31,20 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 
 		format := fn(name).WithDescription(description)
 
+		var (
+			err error
+			nf  *spec.Parameter
+		)
+
+		if nf, err = globalParameters.Get(reflect.TypeOf(field.Value()), format); err == nil {
+			result = append(result, nf)
+			continue
+		} else {
+			if !errors.Is(err, errParameterNotFound) {
+				panic(err)
+			}
+		}
+
 		// get kind
 		kind := field.Kind()
 
@@ -39,23 +54,11 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 			kind = reflect.TypeOf(target).Field(index).Type.Elem().Kind()
 		}
 
-		var typ, tmpFmt string
 		// now type switch for types
 		// TODO: finish https://github.com/OAI/OpenAPI-Specification/blob/main/versions/2.0.md#data-types
 		// TODO: add support for arrays? Is it needed?
 		switch kind {
 		// simplified (no format)
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			typ = "integer"
-		case reflect.Float32:
-			typ = "number"
-			tmpFmt = "float"
-		case reflect.Float64:
-			typ = "number"
-			tmpFmt = "double"
-		case reflect.String:
-			typ = "string"
 		case reflect.Struct:
 			for _, subParam := range inspectParams(field.Value(), fn) {
 				// only when field is not embedded we add scope
@@ -68,11 +71,6 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 		default:
 			panic(fmt.Sprintf("unsupported kind %v", kind.String()))
 		}
-
-		format.SimpleSchema.Type = typ
-		format.SimpleSchema.Format = tmpFmt
-
-		result = append(result, format)
 	}
 
 	return result

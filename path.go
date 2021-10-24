@@ -140,9 +140,12 @@ func (p *path) Response(status int, what interface{}, options ...*ResponseOption
 
 	var opts *ResponseOptions
 
-	if len(options) > 0 {
+	if len(options) > 0 && options[0] != nil {
 		opts = options[0]
+	} else {
+		opts = &ResponseOptions{}
 	}
+	opts.Defaults()
 
 	// no response
 	if what == nil {
