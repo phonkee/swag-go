@@ -190,30 +190,20 @@ func (p *path) spec() spec.Paths {
 func (p *path) operation() *spec.Operation {
 	result := &spec.Operation{
 		OperationProps: spec.OperationProps{
-			Description:  p.info.Options.Description,
-			Consumes:     nil,
-			Produces:     nil,
-			Schemes:      nil,
-			Tags:         p.info.Options.Tags,
-			Summary:      "",
-			ExternalDocs: nil,
-			ID:           "",
-			Deprecated:   false,
+			Description: p.info.Options.Description,
+			//Consumes:     nil,
+			//Produces:     nil,
+			//Schemes:      nil,
+			Tags: p.info.Options.Tags,
+			//Summary:      "",
+			//ExternalDocs: nil,
+			//ID:           "",
+			//Deprecated:   false,
 			//Security:     nil,
 			//Parameters:   nil,
 			Responses: &spec.Responses{
 				ResponsesProps: spec.ResponsesProps{
-					Default: nil,
-					StatusCodeResponses: map[int]spec.Response{
-						http.StatusNotFound: {
-							ResponseProps: spec.ResponseProps{
-								Description: "asdfasfdsf",
-								Schema:      nil,
-								Headers:     nil,
-								Examples:    nil,
-							},
-						},
-					},
+					StatusCodeResponses: map[int]spec.Response{},
 				},
 			},
 		},
