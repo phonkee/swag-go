@@ -69,3 +69,16 @@ func TestParams(t *testing.T) {
 			PathParams(TestParamsParams{})
 	})
 }
+
+func TestPrefix(t *testing.T) {
+	t.Run("test prefix", func(t *testing.T) {
+		swg := New("hello")
+		swgPrefix := swg.Prefix("/api/v1")
+		swgUserPrefix := swgPrefix.Prefix("user")
+		swgUserPrefix.Path("", http.MethodGet).
+			Response(http.StatusNotFound, nil)
+
+		_ = swg
+
+	})
+}

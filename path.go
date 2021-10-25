@@ -173,7 +173,7 @@ func (p *path) Response(status int, what interface{}, options ...*ResponseOption
 	return p
 }
 
-func (p *path) Spec() spec.Paths {
+func (p *path) spec() spec.Paths {
 
 	// now add all responses to item
 	// TODO: now we need to merge here things, and return correct things

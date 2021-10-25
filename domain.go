@@ -32,8 +32,8 @@ type Swagger interface {
 	PathProvider
 	PrefixProvider
 
-	// Spec returns spec and caches it
-	Spec() *spec.Swagger
+	// spec returns specification and caches it
+	spec() *spec.Swagger
 
 	// private methods
 	addPath(*path)
@@ -53,8 +53,8 @@ type Path interface {
 	// if no response is provided, no body is defined, if only nil is passed all previous responses defined will be removed)
 	Response(status int, response interface{}, options ...*ResponseOptions) Path
 
-	// Spec returns spec compatible Paths
-	Spec() spec.Paths
+	// Spec returns specification compatible Paths
+	spec() spec.Paths
 }
 
 // Prefix TODO: implement prefix in future

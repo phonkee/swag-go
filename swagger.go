@@ -42,13 +42,13 @@ func New(title string, options ...*Options) Swagger {
 
 // swagger implementation of Swagger
 type swagger struct {
-	title       string
-	spec        spec.Swagger
-	options     *Options
-	definitions spec.Definitions
-	once        resync.Once
-	cached      *spec.Swagger
-	paths       []*path
+	title         string
+	specification spec.Swagger
+	options       *Options
+	definitions   spec.Definitions
+	once          resync.Once
+	cached        *spec.Swagger
+	paths         []*path
 }
 
 func (s *swagger) addPath(p *path) {
@@ -57,7 +57,7 @@ func (s *swagger) addPath(p *path) {
 
 // MarshalJSON marshals into json and caches result
 func (s *swagger) MarshalJSON() (response []byte, err error) {
-	return json.Marshal(s.Spec())
+	return json.Marshal(s.spec())
 }
 
 // Path returns path
@@ -92,12 +92,16 @@ func (s *swagger) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
 		opts = options[0]
 	}
 	return newPrefix(&prefixInfo{
-		swagger:    s,
-		pathPrefix: pathPrefix,
+		definitions: s.definitions,
+		swagger:     s,
+		pathPrefix:  pathPrefix,
 		resetCache: func() {
 			s.once.Reset()
 		},
 		responses: map[int]*response{},
+		invalidate: func() {
+			s.once.Reset()
+		},
 	}, opts)
 }
 
@@ -111,12 +115,12 @@ func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// Spec returns spec swagger
+// spec returns specification swagger
 // TODO: finish this
-func (s *swagger) Spec() *spec.Swagger {
+func (s *swagger) spec() *spec.Swagger {
 	// only once please
 	s.once.Do(func() {
-		s.spec = spec.Swagger{
+		s.specification = spec.Swagger{
 			VendorExtensible: spec.VendorExtensible{},
 			SwaggerProps: spec.SwaggerProps{
 				//ID:      "http://localhost:3849/api-docs",
@@ -143,8 +147,8 @@ func (s *swagger) Spec() *spec.Swagger {
 			VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
 			Paths:            map[string]spec.PathItem{
 				//"/": {
-				//	PathItemProps: spec.PathItemProps{
-				//		Get: spec.NewOperation("what").WithTags().WithID("getThing"),
+				//	PathItemProps: specification.PathItemProps{
+				//		Get: specification.NewOperation("what").WithTags().WithID("getThing"),
 				//		//Put:        nil,
 				//		//Post:       nil,
 				//		//Delete:     nil,
@@ -153,23 +157,23 @@ func (s *swagger) Spec() *spec.Swagger {
 				//		//Patch:      nil,
 				//		//Parameters: nil,
 				//	},
-				//	//Refable: spec.Refable{Ref: spec.MustCreateRef("cats")},
+				//	//Refable: specification.Refable{Ref: specification.MustCreateRef("cats")},
 				//},
 			},
 		}
-		s.spec.Paths = &paths
+		s.specification.Paths = &paths
 
 		for _, p := range s.paths {
-			for k, v := range p.Spec().Paths {
-				if _, ok := s.spec.Paths.Paths[k]; !ok {
-					s.spec.Paths.Paths[k] = spec.PathItem{
+			for k, v := range p.spec().Paths {
+				if _, ok := s.specification.Paths.Paths[k]; !ok {
+					s.specification.Paths.Paths[k] = spec.PathItem{
 						PathItemProps: spec.PathItemProps{
 							Parameters: []spec.Parameter{},
 						},
 					}
 				}
 
-				where := s.spec.Paths.Paths[k]
+				where := s.specification.Paths.Paths[k]
 
 				for _, def := range []struct {
 					from *spec.Operation
@@ -190,5 +194,5 @@ func (s *swagger) Spec() *spec.Swagger {
 			}
 		}
 	})
-	return &s.spec
+	return &s.specification
 }
