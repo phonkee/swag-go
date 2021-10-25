@@ -81,7 +81,7 @@ func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Sche
 	var err error
 
 	if result, err = getSchema(target, defs); err != nil {
-		panic(err)
+		panic(fmt.Sprintf("cannot inspect %T: %v", target, err))
 	}
 
 	return

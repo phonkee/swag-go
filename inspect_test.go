@@ -83,8 +83,8 @@ func TestInspectSchema(t *testing.T) {
 		defs := spec.Definitions{}
 		schema := inspectSchema(Response{}, defs)
 		assert.NotNil(t, schema)
-		assert.Equal(t, schema.Properties["Some"].ID, "Some")
-		assert.Equal(t, schema.Properties["other"].ID, "other")
+		assert.Equal(t, "Some", schema.Properties["Some"].ID)
+		assert.Equal(t, "other", schema.Properties["other"].ID)
 	})
 
 	t.Run("test top level array", func(t *testing.T) {
