@@ -1,5 +1,8 @@
 package swag
 
+// TODO: prefix is not implemented yet, should not be very complicated though
+// Currently it's lower priority but soon it will be implemented
+
 type prefixInfo struct {
 	swagger    *swagger
 	pathPrefix string

@@ -12,14 +12,15 @@ type Options struct {
 	Description string
 	Version     string
 	Host        string
-	BasePath    string
 	License     *License
 	Contact     *ContactInfo
 }
 
 // Defaults fill blank values
 func (s *Options) Defaults() {
-
+	if s.Version == "" {
+		s.Version = DefaultVersion
+	}
 }
 
 // New returns new swagger
