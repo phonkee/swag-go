@@ -100,7 +100,6 @@ func TestSchema(t *testing.T) {
 		assert.Equal(t, specType("array"), sch.Properties["int_array"].Type)
 		assert.Equal(t, specType("integer"), sch.Properties["int_array"].Items.Schema.Type)
 		assert.Equal(t, true, sch.Properties["int_array"].Items.Schema.Nullable)
-
 	})
 
 }

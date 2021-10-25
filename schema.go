@@ -121,8 +121,18 @@ func init() {
 			elem = elem.Elem()
 		}
 
+		inner, errInner := registry.getSchema(reflect.New(elem).Elem().Interface(), definitions)
+		if errInner != nil {
+			return nil, errInner
+		}
+
 		sch.Items = &spec.SchemaOrArray{
-			Schema: inspectSchema(reflect.New(elem).Interface(), definitions),
+			Schema: inner,
+		}
+
+		// TODO: remove this hack
+		if reflect.TypeOf(i).Elem().Kind() == reflect.Ptr {
+			sch.Items.Schema.Nullable = true
 		}
 
 		return sch, nil
