@@ -141,13 +141,13 @@ func init() {
 
 func mustRegisterSchemaType(target interface{}, fn func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error)) {
 	if err := schemaReg.registerSchema(target, fn); err != nil {
-		panic(err)
+		panic(fmt.Sprintf("cannot register schema type %T: %v", target, err))
 	}
 }
 
-func mustRegisterSchemaKind(fn func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error), targets ...reflect.Kind) {
-	if err := schemaReg.registerKind(fn, targets...); err != nil {
-		panic(err)
+func mustRegisterSchemaKind(fn func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error), kinds ...reflect.Kind) {
+	if err := schemaReg.registerKind(fn, kinds...); err != nil {
+		panic(fmt.Sprintf("cannot register schema kind: %v", err))
 	}
 }
 
