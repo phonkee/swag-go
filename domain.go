@@ -20,7 +20,7 @@ type PathProvider interface {
 
 type PrefixProvider interface {
 	// Prefix adds ability to group endpoints and have common properties (response, query params, path params)
-	Prefix(path string) Prefix
+	Prefix(path string, options ...*PrefixOptions) Prefix
 }
 
 // Swagger is main interface

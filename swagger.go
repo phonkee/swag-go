@@ -96,14 +96,18 @@ func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
 }
 
 // Prefix returns prefixed prefix
-func (s *swagger) Prefix(pathPrefix string) Prefix {
+func (s *swagger) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
+	var opts *PrefixOptions
+	if len(options) > 0 && options[0] != nil {
+		opts = options[0]
+	}
 	return newPrefix(&prefixInfo{
 		swagger:    s,
 		pathPrefix: pathPrefix,
 		resetCache: func() {
 			s.once.Reset()
 		},
-	})
+	}, opts)
 }
 
 // ServeHTTP gives ability to use it in net/http
