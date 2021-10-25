@@ -15,20 +15,20 @@ func intPtr(i int) *int {
 func TestParameters(t *testing.T) {
 	t.Run("test valid parameters", func(t *testing.T) {
 		data := []struct {
-			typ        reflect.Type
-			fn         func(parameter *spec.Parameter, p reflect.Type)
+			kind       reflect.Kind
+			fn         func(p *parameters, parameter *spec.Parameter, _ interface{})
 			example    interface{}
 			expectType string
 		}{
-			{reflect.TypeOf(int(10)), func(parameter *spec.Parameter, _ reflect.Type) { parameter.Type = "integer" }, int(1), "integer"},
-			{reflect.TypeOf(int(10)), func(parameter *spec.Parameter, _ reflect.Type) { parameter.Type = "integer" }, intPtr(1), "integer"},
+			{reflect.TypeOf(int(10)).Kind(), func(p *parameters, parameter *spec.Parameter, _ interface{}) { parameter.Type = "integer" }, int(1), "integer"},
+			{reflect.TypeOf(int(10)).Kind(), func(p *parameters, parameter *spec.Parameter, _ interface{}) { parameter.Type = "integer" }, intPtr(1), "integer"},
 		}
 
 		for _, item := range data {
 			ps := newParameters()
-			ps.RegisterParameter([]reflect.Type{item.typ}, item.fn)
-			p, err := ps.Get(reflect.TypeOf(item.example), spec.QueryParam("param"))
-			assert.NoError(t, err)
+			ps.RegisterKind([]reflect.Kind{item.kind}, item.fn)
+			p, err := ps.Get(item.example, spec.QueryParam("param"))
+			assert.NoError(t, err, "example: %v", item.example)
 			assert.Equal(t, p.Type, item.expectType)
 		}
 	})
@@ -37,12 +37,12 @@ func TestParameters(t *testing.T) {
 		type Example struct {
 		}
 		ps := newParameters()
-		ps.RegisterParameter([]reflect.Type{reflect.TypeOf(Example{})}, func(parameter *spec.Parameter, r reflect.Type) {
+		ps.RegisterParameter([]reflect.Type{reflect.TypeOf(Example{})}, func(p *parameters, parameter *spec.Parameter, r reflect.Type) {
 			parameter.Type = "example"
 			parameter.Format = "custom"
 		})
 
-		ex, err := ps.Get(reflect.TypeOf(&Example{}), spec.QueryParam("example"))
+		ex, err := ps.Get(&Example{}, spec.QueryParam("example"))
 		assert.NoError(t, err)
 		assert.Equal(t, ex.Type, "example")
 		assert.Equal(t, ex.Format, "custom")

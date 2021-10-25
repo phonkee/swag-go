@@ -36,7 +36,7 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 			nf  *spec.Parameter
 		)
 
-		if nf, err = globalParameters.Get(reflect.TypeOf(field.Value()), format); err == nil {
+		if nf, err = globalParameters.Get(field.Value(), format); err == nil {
 			result = append(result, nf)
 			continue
 		} else {
