@@ -56,7 +56,6 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 
 		// now type switch for types
 		// TODO: finish https://github.com/OAI/OpenAPI-Specification/blob/main/versions/2.0.md#data-types
-		// TODO: add support for arrays? Is it needed?
 		switch kind {
 		// simplified (no format)
 		case reflect.Struct:
@@ -68,6 +67,16 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 				result = append(result, subParam)
 			}
 			continue
+		case reflect.Slice:
+			// TODO: finish slice
+			format.Type = "array"
+			format.Items = &spec.Items{
+				SimpleSchema: spec.SimpleSchema{
+					Type: "__notimplementednow__",
+				},
+			}
+
+			result = append(result, format)
 		default:
 			panic(fmt.Sprintf("unsupported kind %v", kind.String()))
 		}

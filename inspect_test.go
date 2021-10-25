@@ -71,6 +71,16 @@ func TestInspectParams(t *testing.T) {
 		assert.Equal(t, "Fourth1", inspected[4].Name)
 		assert.Equal(t, "fourth2", inspected[5].Name)
 	})
+
+	t.Run("test arrays/slices", func(t *testing.T) {
+		type Hello struct {
+			Greetings []string `json:"greetings"`
+		}
+
+		inspected := inspectParams(Hello{}, spec.PathParam)
+		assert.Equal(t, "array", inspected[0].Type)
+		// TODO: finish me
+	})
 }
 
 func TestInspectSchema(t *testing.T) {
