@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/fatih/structs"
 	"github.com/go-openapi/spec"
@@ -64,6 +65,7 @@ func init() {
 				continue
 			}
 
+			// TODO: pointers not working?
 			name := getFieldName(field)
 			sch, err := registry.getSchema(field.Value(), definitions)
 			if err != nil {
@@ -75,10 +77,21 @@ func init() {
 		return result, nil
 	}, reflect.Struct)
 
+	mustRegisterSchemaType(time.Time{}, func(registry *schemaRegistry, i interface{}, definitions spec.Definitions) (*spec.Schema, error) {
+		return &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type:   []string{"integer"},
+				Format: "date-time",
+			},
+		}, nil
+	})
+
 }
 
-func mustRegisterSchema(target interface{}, fn func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error)) error {
-	return schemaReg.registerSchema(target, fn)
+func mustRegisterSchemaType(target interface{}, fn func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error)) {
+	if err := schemaReg.registerSchema(target, fn); err != nil {
+		panic(err)
+	}
 }
 
 func mustRegisterSchemaKind(fn func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error), targets ...reflect.Kind) {
@@ -133,6 +146,10 @@ func (s *schemaRegistry) getSchema(target interface{}, defs spec.Definitions) (*
 	defer s.mutex.RUnlock()
 
 	typ := reflect.TypeOf(target)
+
+	for typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
 
 	if found, ok := s.storage[typ]; ok {
 		result, err := found(s, target, defs)
