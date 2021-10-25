@@ -56,6 +56,7 @@ func init() {
 		},
 	)
 
+	// TODO: finish Ptr
 	registerParameterKind([]reflect.Kind{reflect.Ptr}, func(p *parameters, parameter *spec.Parameter, i interface{}) {
 		typ := reflect.TypeOf(i)
 		for typ.Kind() != reflect.Ptr {
@@ -64,6 +65,11 @@ func init() {
 
 		panic("not implemented")
 	})
+
+	// TODO: finish struct and remove hardcoded
+	//registerParameterKind([]reflect.Kind{reflect.Struct}, func(p *parameters, parameter *spec.Parameter, i interface{}) {
+	//	panic("not implemented")
+	//})
 
 }
 
