@@ -17,9 +17,24 @@ func init() {
 	paramIntFunc := func(parameter *spec.Parameter, p reflect.Type) {
 		parameter.Type = "integer"
 	}
-	registerParameter(paramIntFunc, reflect.TypeOf(int(0)), reflect.TypeOf(int8(0)), reflect.TypeOf(int16(0)), reflect.TypeOf(int32(0)), reflect.TypeOf(int64(0)))
-	registerParameter(paramIntFunc, reflect.TypeOf(uint(0)), reflect.TypeOf(uint8(0)), reflect.TypeOf(uint16(0)), reflect.TypeOf(uint32(0)), reflect.TypeOf(uint64(0)))
-	registerParameter(func(parameter *spec.Parameter, t reflect.Type) {
+	registerParameter([]reflect.Type{
+		reflect.TypeOf(int(0)),
+		reflect.TypeOf(int8(0)),
+		reflect.TypeOf(int16(0)),
+		reflect.TypeOf(int32(0)),
+		reflect.TypeOf(int64(0)),
+	}, paramIntFunc)
+	registerParameter([]reflect.Type{
+		reflect.TypeOf(uint(0)),
+		reflect.TypeOf(uint8(0)),
+		reflect.TypeOf(uint16(0)),
+		reflect.TypeOf(uint32(0)),
+		reflect.TypeOf(uint64(0)),
+	}, paramIntFunc)
+	registerParameter([]reflect.Type{
+		reflect.TypeOf(float32(1)),
+		reflect.TypeOf(float64(1)),
+	}, func(parameter *spec.Parameter, t reflect.Type) {
 		switch t.Kind() {
 		case reflect.Float32:
 			parameter.Type = "number"
@@ -28,15 +43,23 @@ func init() {
 			parameter.Type = "number"
 			parameter.Format = "double"
 		}
-	}, reflect.TypeOf(float32(1)), reflect.TypeOf(float64(1)))
-	registerParameter(func(parameter *spec.Parameter, r reflect.Type) {
-		parameter.Type = "string"
-	}, reflect.TypeOf(""))
+	})
+	registerParameter([]reflect.Type{reflect.TypeOf("")},
+		func(parameter *spec.Parameter, r reflect.Type) {
+			parameter.Type = "string"
+		},
+	)
+
+	registerParameter([]reflect.Type{reflect.TypeOf(true)},
+		func(parameter *spec.Parameter, r reflect.Type) {
+			parameter.Type = "boolean"
+		},
+	)
 }
 
 // registerParameter registers parameter for given type
-func registerParameter(fn func(*spec.Parameter, reflect.Type), types ...reflect.Type) {
-	globalParameters.RegisterParameter(fn, types...)
+func registerParameter(types []reflect.Type, fn func(*spec.Parameter, reflect.Type)) {
+	globalParameters.RegisterParameter(types, fn)
 }
 
 // getParameter returns parameter
@@ -77,7 +100,7 @@ func (p *parameters) Get(typ reflect.Type, param *spec.Parameter) (*spec.Paramet
 	return nil, errParameterNotFound
 }
 
-func (p *parameters) RegisterParameter(fn func(*spec.Parameter, reflect.Type), types ...reflect.Type) {
+func (p *parameters) RegisterParameter(types []reflect.Type, fn func(*spec.Parameter, reflect.Type)) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 

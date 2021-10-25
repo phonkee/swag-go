@@ -26,7 +26,7 @@ func TestParameters(t *testing.T) {
 
 		for _, item := range data {
 			ps := newParameters()
-			ps.RegisterParameter(item.fn, item.typ)
+			ps.RegisterParameter([]reflect.Type{item.typ}, item.fn)
 			p, err := ps.Get(reflect.TypeOf(item.example), spec.QueryParam("param"))
 			assert.NoError(t, err)
 			assert.Equal(t, p.Type, item.expectType)
@@ -37,10 +37,10 @@ func TestParameters(t *testing.T) {
 		type Example struct {
 		}
 		ps := newParameters()
-		ps.RegisterParameter(func(parameter *spec.Parameter, r reflect.Type) {
+		ps.RegisterParameter([]reflect.Type{reflect.TypeOf(Example{})}, func(parameter *spec.Parameter, r reflect.Type) {
 			parameter.Type = "example"
 			parameter.Format = "custom"
-		}, reflect.TypeOf(Example{}))
+		})
 
 		ex, err := ps.Get(reflect.TypeOf(&Example{}), spec.QueryParam("example"))
 		assert.NoError(t, err)
