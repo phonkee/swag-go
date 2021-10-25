@@ -48,7 +48,6 @@ type swagger struct {
 	definitions spec.Definitions
 	once        resync.Once
 	cached      *spec.Swagger
-	generated   []byte
 	paths       []*path
 }
 
@@ -58,16 +57,7 @@ func (s *swagger) addPath(p *path) {
 
 // MarshalJSON marshals into json and caches result
 func (s *swagger) MarshalJSON() (response []byte, err error) {
-	s.once.Do(func() {
-		// if not generated or changed, do that now
-		s.generated, err = json.Marshal(s.generated)
-	})
-
-	if err != nil {
-		return
-	}
-
-	return s.generated, nil
+	return json.Marshal(s.Spec())
 }
 
 // Path returns path

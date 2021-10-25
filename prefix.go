@@ -23,7 +23,11 @@ func newPrefix(info *prefixInfo, options *PrefixOptions) Prefix {
 		options = &PrefixOptions{}
 	}
 	options.Defaults()
-	result := &prefix{info: info, options: options, responses: map[int]*response{}}
+	result := &prefix{
+		info:      info,
+		options:   options,
+		responses: map[int]*response{},
+	}
 
 	// copy responses
 	for key, val := range info.responses {
