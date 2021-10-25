@@ -98,6 +98,7 @@ func init() {
 		return result, nil
 	}, reflect.Struct)
 
+	// handle time.Time
 	mustRegisterSchemaType(time.Time{}, func(registry *schemaRegistry, i interface{}, definitions spec.Definitions) (*spec.Schema, error) {
 		return &spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -107,6 +108,25 @@ func init() {
 		}, nil
 	})
 
+	// handle array/slice
+	mustRegisterSchemaKind(func(registry *schemaRegistry, i interface{}, definitions spec.Definitions) (*spec.Schema, error) {
+		sch := &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"array"},
+			},
+		}
+
+		elem := reflect.TypeOf(i).Elem()
+		if elem.Kind() == reflect.Ptr {
+			elem = elem.Elem()
+		}
+
+		sch.Items = &spec.SchemaOrArray{
+			Schema: inspectSchema(reflect.New(elem).Interface(), definitions),
+		}
+
+		return sch, nil
+	}, reflect.Array, reflect.Slice)
 }
 
 func mustRegisterSchemaType(target interface{}, fn func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error)) {

@@ -9,6 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func specType(name string) spec.StringOrArray {
+	return spec.StringOrArray{name}
+}
+
 func TestSchema(t *testing.T) {
 	t.Run("test basic types in schema", func(t *testing.T) {
 		data := []struct {
@@ -65,31 +69,36 @@ func TestSchema(t *testing.T) {
 			Time2       *time.Time `json:"tyme2"`
 			Buul        bool       `json:"buul"`
 			Buul2       *bool      `json:"buul2"`
+			IntArray    []int      `json:"int_array"`
 		}
 		sch, err := getSchema(&ExampleSchema{}, make(spec.Definitions))
 		assert.NoError(t, err)
 		assert.NotNil(t, sch)
 		// increment this when doing changes to ExampleSchema
-		assert.Equal(t, len(sch.Properties), 6)
+		assert.Equal(t, len(sch.Properties), 7)
 
-		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["IntValue"].Type)
+		assert.Equal(t, specType("integer"), sch.Properties["IntValue"].Type)
 		assert.Equal(t, false, sch.Properties["IntValue"].Nullable)
-		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["int_ptr_value"].Type)
+		assert.Equal(t, specType("integer"), sch.Properties["int_ptr_value"].Type)
 		// TODO: fix this
 		assert.Equal(t, true, sch.Properties["int_ptr_value"].Nullable)
 
-		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["tyme"].Type)
+		assert.Equal(t, specType("integer"), sch.Properties["tyme"].Type)
 		assert.Equal(t, "date-time", sch.Properties["tyme"].Format)
 		assert.Equal(t, false, sch.Properties["tyme"].Nullable)
 
-		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["tyme2"].Type)
+		assert.Equal(t, specType("integer"), sch.Properties["tyme2"].Type)
 		assert.Equal(t, "date-time", sch.Properties["tyme2"].Format)
 		assert.Equal(t, true, sch.Properties["tyme2"].Nullable)
 
-		assert.Equal(t, spec.StringOrArray{"boolean"}, sch.Properties["buul"].Type)
+		assert.Equal(t, specType("boolean"), sch.Properties["buul"].Type)
 		assert.Equal(t, false, sch.Properties["buul"].Nullable)
-		assert.Equal(t, spec.StringOrArray{"boolean"}, sch.Properties["buul2"].Type)
+		assert.Equal(t, specType("boolean"), sch.Properties["buul2"].Type)
 		assert.Equal(t, true, sch.Properties["buul2"].Nullable)
+
+		// IntArray
+		assert.Equal(t, specType("array"), sch.Properties["int_array"].Type)
+		assert.Equal(t, specType("integer"), sch.Properties["int_array"].Items.Schema.Type)
 
 	})
 
