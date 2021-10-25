@@ -14,6 +14,7 @@ type prefixInfo struct {
 	swagger    *swagger
 	pathPrefix string
 	resetCache func()
+	responses  map[int]*response
 }
 
 func newPrefix(info *prefixInfo, options *PrefixOptions) Prefix {
@@ -21,16 +22,25 @@ func newPrefix(info *prefixInfo, options *PrefixOptions) Prefix {
 	if options == nil {
 		options = &PrefixOptions{}
 	}
-	return &prefix{info: info, options: options}
+	options.Defaults()
+	result := &prefix{info: info, options: options, responses: map[int]*response{}}
+
+	// copy responses
+	for key, val := range info.responses {
+		result.responses[key] = val
+	}
+
+	return result
 }
 
 // prefix is special path that only creates new paths
 type prefix struct {
-	info    *prefixInfo
-	options *PrefixOptions
+	info      *prefixInfo
+	options   *PrefixOptions
+	responses map[int]*response
 }
 
-func (p *prefix) Prefix(path string, options ...*PrefixOptions) Prefix {
+func (p *prefix) Prefix(prefix string, options ...*PrefixOptions) Prefix {
 	p.info.resetCache()
 	panic("implement me")
 }

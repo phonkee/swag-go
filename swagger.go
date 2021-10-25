@@ -107,6 +107,7 @@ func (s *swagger) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
 		resetCache: func() {
 			s.once.Reset()
 		},
+		responses: map[int]*response{},
 	}, opts)
 }
 
