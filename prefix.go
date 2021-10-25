@@ -99,7 +99,7 @@ func (p *prefix) Response(status int, response interface{}, options ...*Response
 
 func (p *prefix) PathParams(i interface{}) Prefix {
 	p.info.resetCache()
-	//for _, param := range p.Params(i, ParamTypePath) {
+	//for _, param := range p.getParams(i, ParamTypePath) {
 	//	p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *param)
 	//}
 	return p
@@ -107,7 +107,7 @@ func (p *prefix) PathParams(i interface{}) Prefix {
 
 func (p *prefix) QueryParams(i interface{}) Prefix {
 	p.info.resetCache()
-	//for _, param := range p.Params(i, ParamTypePath) {
+	//for _, param := range p.getParams(i, ParamTypePath) {
 	//	p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *param)
 	//}
 	return p

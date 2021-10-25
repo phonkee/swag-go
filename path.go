@@ -10,15 +10,6 @@ import (
 	"github.com/go-openapi/spec"
 )
 
-type paramType string
-
-const (
-	ParamTypeQuery paramType = "query"
-	ParamTypePath  paramType = "path"
-)
-
-type blankResponse int
-
 type pathInfo struct {
 	Path        string
 	Method      string
@@ -61,7 +52,7 @@ func (p *path) Body(i interface{}) Path {
 // PathParams adds path params
 func (p *path) PathParams(i interface{}) Path {
 	p.info.Invalidate()
-	for _, param := range p.Params(i, ParamTypePath) {
+	for _, param := range p.getParams(i, spec.PathParam) {
 		p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *param)
 	}
 
@@ -71,14 +62,39 @@ func (p *path) PathParams(i interface{}) Path {
 // QueryParams adds query params
 func (p *path) QueryParams(i interface{}) Path {
 	p.info.Invalidate()
-	for _, param := range p.Params(i, ParamTypeQuery) {
+	for _, param := range p.getParams(i, spec.PathParam) {
 		_ = param
 		// spew.Dump(param)
 	}
 	return p
 }
 
-func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
+// Response adds response to path
+func (p *path) Response(status int, what interface{}, options ...*ResponseOptions) Path {
+	p.info.Invalidate()
+
+	var opts *ResponseOptions
+
+	if len(options) > 0 && options[0] != nil {
+		opts = options[0]
+	} else {
+		opts = &ResponseOptions{}
+	}
+	opts.Defaults()
+
+	// no response
+	if what == nil {
+		p.responses[status] = nil
+		return p
+	}
+
+	// TODO: when what is nil, we should empty responses?
+	p.responses[status] = newResponse(status, what, opts)
+	return p
+}
+
+// getParams returns params for given struct, typ
+func (p *path) getParams(i interface{}, initFunc func(string) *spec.Parameter) []*spec.Parameter {
 	result := make([]*spec.Parameter, 0)
 	ss := structs.New(i)
 	for index, field := range ss.Fields() {
@@ -91,14 +107,7 @@ func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 			}
 		}
 
-		var format *spec.Parameter
-
-		switch typ {
-		case ParamTypeQuery:
-			format = spec.QueryParam(name).WithDescription(description)
-		case ParamTypePath:
-			format = spec.PathParam(name).WithDescription(description)
-		}
+		format := initFunc(name).WithDescription(description)
 
 		// TODO: here comes parameters.go implementation
 		var (
@@ -155,30 +164,6 @@ func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 	}
 
 	return result
-}
-
-// Response adds response to path
-func (p *path) Response(status int, what interface{}, options ...*ResponseOptions) Path {
-	p.info.Invalidate()
-
-	var opts *ResponseOptions
-
-	if len(options) > 0 && options[0] != nil {
-		opts = options[0]
-	} else {
-		opts = &ResponseOptions{}
-	}
-	opts.Defaults()
-
-	// no response
-	if what == nil {
-		p.responses[status] = nil
-		return p
-	}
-
-	// TODO: when what is nil, we should empty responses?
-	p.responses[status] = newResponse(status, what, opts)
-	return p
 }
 
 func (p *path) spec() spec.Paths {
