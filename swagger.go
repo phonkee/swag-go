@@ -154,8 +154,6 @@ func (s *swagger) spec() *spec.Swagger {
 
 		for _, p := range s.paths {
 
-			spew.Dump(p.spec())
-
 			for k, v := range p.spec().Paths {
 				if _, ok := s.specification.Paths.Paths[k]; !ok {
 					s.specification.Paths.Paths[k] = spec.PathItem{
@@ -165,24 +163,12 @@ func (s *swagger) spec() *spec.Swagger {
 					}
 				}
 
-				where := s.specification.Paths.Paths[k]
-
-				for _, def := range []struct {
-					from *spec.Operation
-					to   *spec.Operation
-				}{
-					{v.Get, where.Get},
-					{v.Post, where.Post},
-					{v.Put, where.Put},
-					{v.Patch, where.Patch},
-					{v.Options, where.Options},
-					{v.Delete, where.Delete},
-					{v.Head, where.Head},
-				} {
-					if def.from != nil {
-						def.to = def.from
-					}
+				temp := s.specification.Paths.Paths[k]
+				if v.Get != nil {
+					temp.PathItemProps.Get = v.Get
 				}
+
+				s.specification.Paths.Paths[k] = temp
 			}
 		}
 	})

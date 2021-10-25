@@ -64,7 +64,6 @@ func (p *path) QueryParams(i interface{}) Path {
 	p.info.Invalidate()
 	for _, param := range p.getParams(i, spec.PathParam) {
 		_ = param
-		// spew.Dump(param)
 	}
 	return p
 }
@@ -182,6 +181,7 @@ func (p *path) spec() spec.Paths {
 	case http.MethodGet:
 		where := result.Paths[p.info.Path]
 		where.PathItemProps.Get = p.operation()
+		result.Paths[p.info.Path] = where
 	}
 
 	return result
@@ -190,7 +190,7 @@ func (p *path) spec() spec.Paths {
 func (p *path) operation() *spec.Operation {
 	result := &spec.Operation{
 		OperationProps: spec.OperationProps{
-			Description:  "",
+			Description:  p.info.Options.Description,
 			Consumes:     nil,
 			Produces:     nil,
 			Schemes:      nil,
@@ -203,8 +203,17 @@ func (p *path) operation() *spec.Operation {
 			//Parameters:   nil,
 			Responses: &spec.Responses{
 				ResponsesProps: spec.ResponsesProps{
-					Default:             nil,
-					StatusCodeResponses: map[int]spec.Response{},
+					Default: nil,
+					StatusCodeResponses: map[int]spec.Response{
+						http.StatusNotFound: {
+							ResponseProps: spec.ResponseProps{
+								Description: "asdfasfdsf",
+								Schema:      nil,
+								Headers:     nil,
+								Examples:    nil,
+							},
+						},
+					},
 				},
 			},
 		},

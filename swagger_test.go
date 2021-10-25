@@ -92,6 +92,5 @@ func TestPrefix(t *testing.T) {
 		println(string(data))
 
 		//swg.Debug()
-		//spew.Dump(spe.Paths["/api/v1/user"])
 	})
 }
