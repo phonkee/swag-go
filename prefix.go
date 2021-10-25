@@ -52,26 +52,7 @@ type prefix struct {
 }
 
 func (p *prefix) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
-	p.info.resetCache()
-	var opts *PrefixOptions
-	if len(options) > 0 && options[0] != nil {
-		opts = options[0]
-	}
-	info := *p.info
-
-	// take care about paths
-	{
-		if !strings.HasSuffix(info.pathPrefix, "/") {
-			info.pathPrefix = info.pathPrefix + "/"
-		}
-		info.pathPrefix = info.pathPrefix + strings.TrimPrefix(pathPrefix, "/")
-	}
-
-	return &prefix{
-		info:      &info,
-		options:   opts,
-		responses: map[int]*response{},
-	}
+	return p.copy(pathPrefix, options...)
 }
 
 func (p *prefix) Path(path string, method string, options ...*PathOptions) Path {
@@ -115,4 +96,32 @@ func (p *prefix) QueryParams(i interface{}) Prefix {
 	//	p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *param)
 	//}
 	return p
+}
+
+func (p *prefix) copy(pathPrefix string, options ...*PrefixOptions) Prefix {
+	p.info.resetCache()
+	opts := &*p.options
+	info := *p.info
+
+	// take care about paths
+	{
+		if !strings.HasSuffix(info.pathPrefix, "/") {
+			info.pathPrefix = info.pathPrefix + "/"
+		}
+		info.pathPrefix = info.pathPrefix + strings.TrimPrefix(pathPrefix, "/")
+	}
+
+	result := &prefix{
+		info:      &info,
+		options:   opts,
+		responses: map[int]*response{},
+	}
+
+	// copy all responses
+	for k, v := range p.responses {
+		result.responses[k] = v
+	}
+
+	return result
+
 }
