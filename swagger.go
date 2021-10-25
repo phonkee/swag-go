@@ -33,28 +33,7 @@ func New(title string, options ...*Options) Swagger {
 	}
 	opts.Defaults()
 	return &swagger{
-		spec: spec.Swagger{
-			VendorExtensible: spec.VendorExtensible{},
-			SwaggerProps: spec.SwaggerProps{
-				//ID:      "http://localhost:3849/api-docs",
-				Swagger:  "2.0",
-				Consumes: []string{"application/json"},
-				Produces: []string{"application/json"},
-				Schemes:  []string{"http", "https"},
-				Info: &spec.Info{
-					InfoProps: spec.InfoProps{
-						Description: opts.Description,
-						Title:       title,
-						//TermsOfService: "",
-						Contact: opts.Contact.Spec(),
-						License: opts.License.Spec(),
-						Version: opts.Version,
-					},
-				},
-				Host:     "some.api.out.there",
-				BasePath: "/",
-			},
-		},
+		title:       title,
 		options:     opts,
 		definitions: make(spec.Definitions),
 		paths:       make([]*path, 0),
@@ -63,10 +42,12 @@ func New(title string, options ...*Options) Swagger {
 
 // swagger implementation of Swagger
 type swagger struct {
+	title       string
 	spec        spec.Swagger
 	options     *Options
 	definitions spec.Definitions
 	once        resync.Once
+	cached      *spec.Swagger
 	generated   []byte
 	paths       []*path
 }
@@ -138,56 +119,81 @@ func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 // Spec returns spec swagger
 // TODO: finish this
 func (s *swagger) Spec() *spec.Swagger {
-	var paths = spec.Paths{
-		VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
-		Paths:            map[string]spec.PathItem{
-			//"/": {
-			//	PathItemProps: spec.PathItemProps{
-			//		Get: spec.NewOperation("what").WithTags().WithID("getThing"),
-			//		//Put:        nil,
-			//		//Post:       nil,
-			//		//Delete:     nil,
-			//		//Options:    nil,
-			//		//Head:       nil,
-			//		//Patch:      nil,
-			//		//Parameters: nil,
-			//	},
-			//	//Refable: spec.Refable{Ref: spec.MustCreateRef("cats")},
-			//},
-		},
-	}
-	s.spec.Paths = &paths
-
-	for _, p := range s.paths {
-		for k, v := range p.Spec().Paths {
-			if _, ok := s.spec.Paths.Paths[k]; !ok {
-				s.spec.Paths.Paths[k] = spec.PathItem{
-					PathItemProps: spec.PathItemProps{
-						Parameters: []spec.Parameter{},
+	// only once please
+	s.once.Do(func() {
+		s.spec = spec.Swagger{
+			VendorExtensible: spec.VendorExtensible{},
+			SwaggerProps: spec.SwaggerProps{
+				//ID:      "http://localhost:3849/api-docs",
+				Swagger:  "2.0",
+				Consumes: []string{"application/json"},
+				Produces: []string{"application/json"},
+				Schemes:  []string{"http", "https"},
+				Info: &spec.Info{
+					InfoProps: spec.InfoProps{
+						Description: s.options.Description,
+						Title:       s.title,
+						//TermsOfService: "",
+						Contact: s.options.Contact.Spec(),
+						License: s.options.License.Spec(),
+						Version: s.options.Version,
 					},
+				},
+				Host:     "some.api.out.there",
+				BasePath: "/",
+			},
+		}
+
+		var paths = spec.Paths{
+			VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
+			Paths:            map[string]spec.PathItem{
+				//"/": {
+				//	PathItemProps: spec.PathItemProps{
+				//		Get: spec.NewOperation("what").WithTags().WithID("getThing"),
+				//		//Put:        nil,
+				//		//Post:       nil,
+				//		//Delete:     nil,
+				//		//Options:    nil,
+				//		//Head:       nil,
+				//		//Patch:      nil,
+				//		//Parameters: nil,
+				//	},
+				//	//Refable: spec.Refable{Ref: spec.MustCreateRef("cats")},
+				//},
+			},
+		}
+		s.spec.Paths = &paths
+
+		for _, p := range s.paths {
+			for k, v := range p.Spec().Paths {
+				if _, ok := s.spec.Paths.Paths[k]; !ok {
+					s.spec.Paths.Paths[k] = spec.PathItem{
+						PathItemProps: spec.PathItemProps{
+							Parameters: []spec.Parameter{},
+						},
+					}
 				}
-			}
 
-			where := s.spec.Paths.Paths[k]
+				where := s.spec.Paths.Paths[k]
 
-			for _, def := range []struct {
-				from *spec.Operation
-				to   *spec.Operation
-			}{
-				{v.Get, where.Get},
-				{v.Post, where.Post},
-				{v.Put, where.Put},
-				{v.Patch, where.Patch},
-				{v.Options, where.Options},
-				{v.Delete, where.Delete},
-				{v.Head, where.Head},
-			} {
-				if def.from != nil {
-					def.to = def.from
+				for _, def := range []struct {
+					from *spec.Operation
+					to   *spec.Operation
+				}{
+					{v.Get, where.Get},
+					{v.Post, where.Post},
+					{v.Put, where.Put},
+					{v.Patch, where.Patch},
+					{v.Options, where.Options},
+					{v.Delete, where.Delete},
+					{v.Head, where.Head},
+				} {
+					if def.from != nil {
+						def.to = def.from
+					}
 				}
 			}
 		}
-	}
-
+	})
 	return &s.spec
 }
