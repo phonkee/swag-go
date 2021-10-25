@@ -19,6 +19,7 @@ var (
 func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*spec.Parameter {
 	result := make([]*spec.Parameter, 0)
 	ss := structs.New(target)
+
 	for index, field := range ss.Fields() {
 		description := getFieldDescription(field)
 		name := field.Name()
@@ -31,12 +32,19 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 
 		format := fn(name).WithDescription(description)
 
+
+		val := reflect.ValueOf(target)
+		for val.Type().Kind() == reflect.Ptr {
+			val = val.Elem()
+		}
+
+
 		var (
 			err error
 			nf  *spec.Parameter
 		)
 
-		if nf, err = globalParameters.Get(field.Value(), format); err == nil {
+		if nf, err = globalParameters.Get(val.Field(index).Interface(), format); err == nil {
 			result = append(result, nf)
 			continue
 		} else {

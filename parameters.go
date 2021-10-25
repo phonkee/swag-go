@@ -59,16 +59,39 @@ func init() {
 	// TODO: finish Ptr
 	registerParameterKind([]reflect.Kind{reflect.Ptr}, func(p *parameters, parameter *spec.Parameter, i interface{}) {
 		typ := reflect.TypeOf(i)
-		for typ.Kind() != reflect.Ptr {
+		for typ.Kind() == reflect.Ptr {
 			typ = typ.Elem()
 		}
 
-		panic("not implemented")
+		np, err := p.Get(reflect.New(typ).Elem().Interface(), parameter)
+		if err != nil {
+			panic(err)
+		}
+		np.Required = false
+
+		*parameter = *np
 	})
 
-	// TODO: finish struct and remove hardcoded
+	//// TODO: finish struct and remove hardcoded
 	//registerParameterKind([]reflect.Kind{reflect.Struct}, func(p *parameters, parameter *spec.Parameter, i interface{}) {
-	//	panic("not implemented")
+	//	ss := structs.New(i)
+	//	for _, field := range ss.Fields() {
+	//		for _, subParam := range inspectParams(field.Value(), func(name string) *spec.Parameter {
+	//			result := &*parameter
+	//			result.Name = name
+	//			return result
+	//		}) {
+	//			// only when field is not embedded we add scope
+	//			if !field.IsEmbedded() {
+	//				subParam.Name = fmt.Sprintf("%v%v%v", parameter.Name, ParamsScopeDelimiter, subParam.Name)
+	//			}
+	//			parameter
+	//			result = append(result, subParam)
+	//		}
+	//
+	//	}
+	//
+	//	panic("struct not implemented")
 	//})
 
 }
@@ -85,8 +108,8 @@ func registerParameterKind(kinds []reflect.Kind, fn func(*parameters, *spec.Para
 }
 
 // getParameter returns parameter
-func getParameter(typ reflect.Type, parameter *spec.Parameter) (*spec.Parameter, error) {
-	return globalParameters.Get(typ, parameter)
+func getParameter(what interface{}, parameter *spec.Parameter) (*spec.Parameter, error) {
+	return globalParameters.Get(what, parameter)
 }
 
 // newParameters types
@@ -109,9 +132,6 @@ func (p *parameters) Get(what interface{}, param *spec.Parameter) (*spec.Paramet
 	defer p.mutex.RUnlock()
 
 	typ := reflect.TypeOf(what)
-	for typ.Kind() == reflect.Ptr {
-		typ = typ.Elem()
-	}
 
 	if fn, ok := p.types[typ]; ok {
 		fn(p, param, typ)
