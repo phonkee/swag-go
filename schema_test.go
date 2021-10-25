@@ -69,7 +69,7 @@ func TestSchema(t *testing.T) {
 			Time2       *time.Time `json:"tyme2"`
 			Buul        bool       `json:"buul"`
 			Buul2       *bool      `json:"buul2"`
-			IntArray    []int      `json:"int_array"`
+			IntArray    []*int     `json:"int_array"`
 		}
 		sch, err := getSchema(&ExampleSchema{}, make(spec.Definitions))
 		assert.NoError(t, err)
@@ -99,6 +99,7 @@ func TestSchema(t *testing.T) {
 		// IntArray
 		assert.Equal(t, specType("array"), sch.Properties["int_array"].Type)
 		assert.Equal(t, specType("integer"), sch.Properties["int_array"].Items.Schema.Type)
+		assert.Equal(t, true, sch.Properties["int_array"].Items.Schema.Nullable)
 
 	})
 
