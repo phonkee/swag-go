@@ -14,8 +14,8 @@ type PrefixOptions struct {
 	Description string
 }
 
+// Defaults sets default values correctly (even fix invalid values)
 func (p *PrefixOptions) Defaults() {
-
 }
 
 type prefixInfo struct {
@@ -32,7 +32,10 @@ func newPrefix(info *prefixInfo, options *PrefixOptions) Prefix {
 	if options == nil {
 		options = &PrefixOptions{}
 	}
+	// fix defaults
 	options.Defaults()
+
+	// prepare result
 	result := &prefix{
 		info:      info,
 		options:   options,

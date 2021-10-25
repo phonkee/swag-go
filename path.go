@@ -26,10 +26,11 @@ type pathInfo struct {
 	Options     *PathOptions
 	Invalidate  func()
 	Swagger     *swagger
+	responses   map[int]*response
 }
 
 func newPath(info *pathInfo) *path {
-	return &path{
+	result := &path{
 		info:      info,
 		responses: map[int]*response{},
 		item: spec.PathItem{
@@ -38,6 +39,12 @@ func newPath(info *pathInfo) *path {
 			},
 		},
 	}
+
+	for k, v := range info.responses {
+		result.responses[k] = v
+	}
+
+	return result
 }
 
 type path struct {
