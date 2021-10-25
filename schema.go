@@ -60,16 +60,28 @@ func init() {
 		result.ID = id
 		result.Properties = spec.SchemaProperties{}
 		ss := structs.New(i)
-		for _, field := range ss.Fields() {
+
+		typ := reflect.TypeOf(i)
+		for typ.Kind() == reflect.Ptr {
+			typ = typ.Elem()
+		}
+
+		for index, field := range ss.Fields() {
 			if !isFieldAvailable(field) {
 				continue
 			}
 
 			// TODO: pointers not working?
 			name := getFieldName(field)
+
 			sch, err := registry.getSchema(field.Value(), definitions)
 			if err != nil {
 				return nil, err
+			}
+
+			// TODO: hack for now
+			if typ.Field(index).Type.Kind() == reflect.Ptr {
+				sch.Nullable = true
 			}
 
 			result.Properties[name] = *sch

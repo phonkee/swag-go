@@ -72,7 +72,7 @@ func TestSchema(t *testing.T) {
 		assert.Equal(t, false, sch.Properties["IntValue"].Nullable)
 		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["int_ptr_value"].Type)
 		// TODO: fix this
-		// assert.Equal(t, true, sch.Properties["int_ptr_value"].Nullable)
+		assert.Equal(t, true, sch.Properties["int_ptr_value"].Nullable)
 
 		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["tyme"].Type)
 		assert.Equal(t, "date-time", sch.Properties["tyme"].Format)
