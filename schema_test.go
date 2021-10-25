@@ -1,6 +1,7 @@
 package swag
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/go-openapi/spec"
@@ -29,7 +30,7 @@ func TestSchema(t *testing.T) {
 
 		for _, item := range data {
 			reg := newSchemaRegistry()
-			assert.NoError(t, reg.registerSchema(item.in, func(*schemaRegistry, interface{}) (*spec.Schema, error) {
+			assert.NoError(t, reg.registerSchema(item.in, func(*schemaRegistry, interface{}, spec.Definitions) (*spec.Schema, error) {
 				return item.schemaFunc(item.in), nil
 			}))
 			// check get
@@ -41,20 +42,27 @@ func TestSchema(t *testing.T) {
 
 	})
 
-	t.Run("test kind", func(t *testing.T) {
+	t.Run("test custom kind", func(t *testing.T) {
 		reg := newSchemaRegistry()
-		assert.NoError(t, reg.registerKind(int(0), func(*schemaRegistry, interface{}) (*spec.Schema, error) {
-			return &spec.Schema{
-				SchemaProps: spec.SchemaProps{
-					Type: []string{"integer"},
-				},
-			}, nil
+		type _SomethingTesting struct{}
+
+		assert.NoError(t, reg.registerSchema(_SomethingTesting{}, func(_ *schemaRegistry, in interface{}, d spec.Definitions) (*spec.Schema, error) {
+			return spec.RefSchema(fmt.Sprintf("%T", in)), nil
 		}))
 
-		sch, err := reg.getSchema(int(0), make(spec.Definitions))
+		sch, err := reg.getSchema(_SomethingTesting{}, make(spec.Definitions))
 		assert.NoError(t, err)
 		assert.NotNil(t, sch)
+		assert.Equal(t, "swag._SomethingTesting", sch.Ref.String())
+	})
 
+	t.Run("test defined kinds", func(t *testing.T) {
+		type ExampleSchema struct {
+			IntValue int
+		}
+		sch, err := getSchema(&ExampleSchema{}, make(spec.Definitions))
+		assert.NoError(t, err)
+		assert.NotNil(t, sch)
 	})
 
 }
