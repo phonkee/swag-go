@@ -8,8 +8,7 @@ import (
 
 type ResponseOptions struct {
 	Description string
-	// Headers is any structure with fields
-	Headers interface{}
+	Deprecated  bool
 }
 
 func (r *ResponseOptions) Defaults() {
