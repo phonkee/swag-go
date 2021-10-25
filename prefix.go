@@ -10,6 +10,8 @@ import (
 // Currently it's lower priority but soon it will be implemented
 
 type PrefixOptions struct {
+	// always provided description (other will be appended)
+	Description string
 }
 
 func (p *PrefixOptions) Defaults() {

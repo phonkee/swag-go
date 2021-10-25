@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,9 +80,10 @@ func TestPrefix(t *testing.T) {
 
 		// get specs
 		spe := p.(*path).spec()
-		spew.Dump(spe)
-
-		_ = swg
+		assert.Equal(t, 1, len(spe.Paths))
+		assert.NotPanics(t, func() {
+			_ = spe.Paths["/api/v1/user"]
+		})
 
 	})
 }
