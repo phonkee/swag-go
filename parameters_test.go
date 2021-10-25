@@ -54,14 +54,12 @@ func TestParameters(t *testing.T) {
 	})
 
 	t.Run("test all registered", func(t *testing.T) {
-
 		type FullParametersTestStruct struct {
 			SomInt int
 		}
 
 		x := inspectParams(&FullParametersTestStruct{}, spec.QueryParam)
 		assert.Equal(t, 1, len(x))
-
 	})
 
 }

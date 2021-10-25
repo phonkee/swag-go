@@ -52,7 +52,7 @@ func (p *path) Body(i interface{}) Path {
 // PathParams adds path params
 func (p *path) PathParams(i interface{}) Path {
 	p.info.Invalidate()
-	for _, param := range p.getParams(i, spec.PathParam) {
+	for _, param := range inspectParams(i, spec.PathParam) {
 		p.item.PathItemProps.Parameters = append(p.item.PathItemProps.Parameters, *param)
 	}
 
@@ -62,7 +62,7 @@ func (p *path) PathParams(i interface{}) Path {
 // QueryParams adds query params
 func (p *path) QueryParams(i interface{}) Path {
 	p.info.Invalidate()
-	for _, param := range p.getParams(i, spec.PathParam) {
+	for _, param := range inspectParams(i, spec.PathParam) {
 		_ = param
 	}
 	return p
