@@ -27,6 +27,14 @@ func init() {
 	}, reflect.Ptr)
 
 	// register integer kinds
+	mustRegisterSchemaKind(func(registry *schemaRegistry, i interface{}, definitions spec.Definitions) (*spec.Schema, error) {
+		return &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"string"},
+			},
+		}, nil
+	}, reflect.String)
+	// register integer kinds
 	intSchemaKindFunc := func(registry *schemaRegistry, i interface{}, d spec.Definitions) (sch *spec.Schema, err error) {
 		return &spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -46,6 +54,8 @@ func init() {
 
 		ss := structs.New(i)
 		for _, field := range ss.Fields() {
+
+			// now get each field
 			_ = field
 		}
 		return result, nil
