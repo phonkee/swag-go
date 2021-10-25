@@ -54,7 +54,8 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 			kind = reflect.TypeOf(target).Field(index).Type.Elem().Kind()
 		}
 
-		// now type switch for types
+		// now type switch for kinds
+		// types are defined in parameters.go
 		// TODO: finish https://github.com/OAI/OpenAPI-Specification/blob/main/versions/2.0.md#data-types
 		switch kind {
 		// simplified (no format)
@@ -67,8 +68,8 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 				result = append(result, subParam)
 			}
 			continue
-		case reflect.Slice:
-			// TODO: finish slice
+		case reflect.Slice, reflect.Array:
+			// TODO: finish slice/array support
 			format.Type = "array"
 			format.Items = &spec.Items{
 				SimpleSchema: spec.SimpleSchema{

@@ -92,6 +92,21 @@ func (p *path) Params(i interface{}, typ paramType) []*spec.Parameter {
 			format = spec.PathParam(name).WithDescription(description)
 		}
 
+		// TODO: here comes parameters.go implementation
+		var (
+			err error
+			nf  *spec.Parameter
+		)
+		if nf, err = getParameter(reflect.TypeOf(i), format); err != nil {
+			if err == errParameterNotFound {
+				err = nil
+			} else {
+				panic(err)
+			}
+		} else {
+			format = nf
+		}
+
 		// get kind
 		kind := field.Kind()
 
