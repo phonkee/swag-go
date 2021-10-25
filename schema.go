@@ -53,6 +53,15 @@ func init() {
 	mustRegisterSchemaKind(intSchemaKindFunc, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64)
 	mustRegisterSchemaKind(intSchemaKindFunc, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64)
 
+	// register boolean type
+	mustRegisterSchemaKind(func(registry *schemaRegistry, i interface{}, definitions spec.Definitions) (*spec.Schema, error) {
+		return &spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"boolean"},
+			},
+		}, nil
+	}, reflect.Bool)
+
 	// register struct kind
 	mustRegisterSchemaKind(func(registry *schemaRegistry, i interface{}, definitions spec.Definitions) (*spec.Schema, error) {
 		id := fmt.Sprintf("%T", i)

@@ -63,12 +63,14 @@ func TestSchema(t *testing.T) {
 			IntPtrValue *int       `json:"int_ptr_value"`
 			Time        time.Time  `json:"tyme"`
 			Time2       *time.Time `json:"tyme2"`
+			Buul        bool       `json:"buul"`
+			Buul2       *bool      `json:"buul2"`
 		}
 		sch, err := getSchema(&ExampleSchema{}, make(spec.Definitions))
 		assert.NoError(t, err)
 		assert.NotNil(t, sch)
 		// increment this when doing changes to ExampleSchema
-		assert.Equal(t, len(sch.Properties), 4)
+		assert.Equal(t, len(sch.Properties), 6)
 
 		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["IntValue"].Type)
 		assert.Equal(t, false, sch.Properties["IntValue"].Nullable)
@@ -83,6 +85,12 @@ func TestSchema(t *testing.T) {
 		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["tyme2"].Type)
 		assert.Equal(t, "date-time", sch.Properties["tyme2"].Format)
 		assert.Equal(t, true, sch.Properties["tyme2"].Nullable)
+
+		assert.Equal(t, spec.StringOrArray{"boolean"}, sch.Properties["buul"].Type)
+		assert.Equal(t, false, sch.Properties["buul"].Nullable)
+		assert.Equal(t, spec.StringOrArray{"boolean"}, sch.Properties["buul2"].Type)
+		assert.Equal(t, true, sch.Properties["buul2"].Nullable)
+
 	})
 
 }
