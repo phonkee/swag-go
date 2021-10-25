@@ -60,13 +60,15 @@ func TestSchema(t *testing.T) {
 	t.Run("test defined kinds", func(t *testing.T) {
 		type ExampleSchema struct {
 			IntValue    int
-			IntPtrValue *int      `json:"int_ptr_value"`
-			Time        time.Time `json:"tyme"`
+			IntPtrValue *int       `json:"int_ptr_value"`
+			Time        time.Time  `json:"tyme"`
+			Time2       *time.Time `json:"tyme2"`
 		}
 		sch, err := getSchema(&ExampleSchema{}, make(spec.Definitions))
 		assert.NoError(t, err)
 		assert.NotNil(t, sch)
-		assert.Equal(t, len(sch.Properties), 3)
+		// increment this when doing changes to ExampleSchema
+		assert.Equal(t, len(sch.Properties), 4)
 
 		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["IntValue"].Type)
 		assert.Equal(t, false, sch.Properties["IntValue"].Nullable)
@@ -76,6 +78,11 @@ func TestSchema(t *testing.T) {
 
 		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["tyme"].Type)
 		assert.Equal(t, "date-time", sch.Properties["tyme"].Format)
+		assert.Equal(t, false, sch.Properties["tyme"].Nullable)
+
+		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["tyme2"].Type)
+		assert.Equal(t, "date-time", sch.Properties["tyme2"].Format)
+		assert.Equal(t, true, sch.Properties["tyme2"].Nullable)
 	})
 
 }
