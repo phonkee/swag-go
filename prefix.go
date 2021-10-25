@@ -13,6 +13,7 @@ type PrefixOptions struct {
 }
 
 func (p *PrefixOptions) Defaults() {
+
 }
 
 type prefixInfo struct {
