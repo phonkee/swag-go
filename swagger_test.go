@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -75,8 +76,12 @@ func TestPrefix(t *testing.T) {
 		swg := New("hello")
 		swgPrefix := swg.Prefix("/api/v1")
 		swgUserPrefix := swgPrefix.Prefix("user")
-		swgUserPrefix.Path("", http.MethodGet).
+		p := swgUserPrefix.Path("", http.MethodGet).
 			Response(http.StatusNotFound, nil)
+
+		// get specs
+		spe := p.(*path).spec()
+		spew.Dump(spe)
 
 		_ = swg
 

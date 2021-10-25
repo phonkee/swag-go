@@ -61,7 +61,10 @@ func (p *prefix) Path(path string, method string, options ...*PathOptions) Path 
 	var opts *PathOptions
 	if len(options) > 0 && options[0] != nil {
 		opts = options[0]
+	} else {
+		opts = &PathOptions{}
 	}
+	opts.Defaults()
 
 	return newPath(&pathInfo{
 		Path:        p.info.pathPrefix + path,

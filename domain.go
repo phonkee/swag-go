@@ -13,6 +13,10 @@ type PathOptions struct {
 	Tags        []string
 }
 
+func (p *PathOptions) Defaults() {
+
+}
+
 type PathProvider interface {
 	// Path adds new endpoints
 	Path(path string, method string, options ...*PathOptions) Path

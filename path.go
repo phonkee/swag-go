@@ -2,6 +2,7 @@ package swag
 
 import (
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -183,6 +184,36 @@ func (p *path) spec() spec.Paths {
 			p.info.Path: p.item,
 		},
 	}
+
+	// TODO: finish this huge thing
+	switch p.info.Method {
+	case http.MethodGet:
+		where := result.Paths[p.info.Path]
+		where.PathItemProps.Get = p.operation()
+	}
+
+	return result
+}
+
+func (p *path) operation() *spec.Operation {
+	result := &spec.Operation{
+		OperationProps: spec.OperationProps{
+			Description:  "",
+			Consumes:     nil,
+			Produces:     nil,
+			Schemes:      nil,
+			Tags:         p.info.Options.Tags,
+			Summary:      "",
+			ExternalDocs: nil,
+			ID:           "",
+			Deprecated:   false,
+			//Security:     nil,
+			//Parameters:   nil,
+			//Responses:    nil,
+		},
+	}
+
+	// TODO: add all parameters and responses
 
 	return result
 }
