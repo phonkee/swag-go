@@ -36,6 +36,8 @@ type Swagger interface {
 	PathProvider
 	PrefixProvider
 
+	Debug()
+
 	// spec returns specification and caches it
 	spec() *spec.Swagger
 

@@ -1,6 +1,10 @@
 package swag
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/go-openapi/spec"
+)
 
 type ResponseOptions struct {
 	Description string
@@ -25,4 +29,8 @@ func newResponse(status int, target interface{}, options *ResponseOptions) *resp
 		status:  status,
 		target:  target,
 	}
+}
+
+func (r *response) spec() *spec.Response {
+	return &spec.Response{}
 }

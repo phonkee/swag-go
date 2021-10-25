@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-openapi/spec"
 	"github.com/matryer/resync"
 )
@@ -49,6 +50,12 @@ type swagger struct {
 	once          resync.Once
 	cached        *spec.Swagger
 	paths         []*path
+}
+
+func (s *swagger) Debug() {
+	for _, p := range s.paths {
+		println("path", spew.Sdump(p))
+	}
 }
 
 func (s *swagger) addPath(p *path) {
@@ -138,30 +145,15 @@ func (s *swagger) spec() *spec.Swagger {
 				},
 				Host:     "some.api.out.there",
 				BasePath: "/",
+				Paths: &spec.Paths{
+					VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
+					Paths:            map[string]spec.PathItem{},
+				},
 			},
 		}
-
-		var paths = spec.Paths{
-			VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
-			Paths:            map[string]spec.PathItem{
-				//"/": {
-				//	PathItemProps: specification.PathItemProps{
-				//		Get: specification.NewOperation("what").WithTags().WithID("getThing"),
-				//		//Put:        nil,
-				//		//Post:       nil,
-				//		//Delete:     nil,
-				//		//Options:    nil,
-				//		//Head:       nil,
-				//		//Patch:      nil,
-				//		//Parameters: nil,
-				//	},
-				//	//Refable: specification.Refable{Ref: specification.MustCreateRef("cats")},
-				//},
-			},
-		}
-		s.specification.Paths = &paths
 
 		for _, p := range s.paths {
+			spew.Dump(p)
 			for k, v := range p.spec().Paths {
 				if _, ok := s.specification.Paths.Paths[k]; !ok {
 					s.specification.Paths.Paths[k] = spec.PathItem{

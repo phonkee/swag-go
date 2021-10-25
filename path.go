@@ -201,8 +201,17 @@ func (p *path) operation() *spec.Operation {
 			Deprecated:   false,
 			//Security:     nil,
 			//Parameters:   nil,
-			//Responses:    nil,
+			Responses: &spec.Responses{
+				ResponsesProps: spec.ResponsesProps{
+					Default:             nil,
+					StatusCodeResponses: map[int]spec.Response{},
+				},
+			},
 		},
+	}
+	for status, response := range p.responses {
+		_ = response
+		result.OperationProps.Responses.ResponsesProps.StatusCodeResponses[status] = spec.Response{}
 	}
 
 	// TODO: add all parameters and responses

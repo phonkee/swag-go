@@ -71,7 +71,7 @@ func (p *prefix) Path(path string, method string, options ...*PathOptions) Path 
 	}
 	opts.Defaults()
 
-	return newPath(&pathInfo{
+	result := newPath(&pathInfo{
 		Path:        p.info.pathPrefix + path,
 		Method:      method,
 		Definitions: p.info.definitions,
@@ -79,6 +79,11 @@ func (p *prefix) Path(path string, method string, options ...*PathOptions) Path 
 		Options:     opts,
 		Swagger:     p.info.swagger,
 	})
+
+	// add path
+	p.info.swagger.addPath(result)
+
+	return result
 }
 
 func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Prefix {
