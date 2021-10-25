@@ -78,79 +78,10 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 
 // inspectSchema inspects target and returns Schema
 func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Schema) {
-	required := true
-	typ := reflect.TypeOf(target)
+	var err error
 
-	if typ.Kind() == reflect.Ptr {
-		required = false
-		typ = typ.Elem()
-	}
-
-	switch typ.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return &spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type:     []string{"integer"},
-				Nullable: !required,
-			},
-		}
-	case reflect.String:
-		return &spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type:     []string{"string"},
-				Nullable: !required,
-			},
-		}
-	case reflect.Bool:
-		return &spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type:     []string{"boolean"},
-				Nullable: !required,
-			},
-		}
-	case reflect.Struct:
-		id := fmt.Sprintf("%T", target)
-		id = strings.TrimLeft(id, "*")
-		if r, ok := defs[id]; ok {
-			return &r
-		}
-
-		result = spec.RefSchema(id)
-		result.ID = id
-		result.Properties = spec.SchemaProperties{}
-		result.Nullable = !required
-		for _, field := range structs.New(target).Fields() {
-			if !isFieldAvailable(field) {
-				continue
-			}
-			fsch := inspectSchema(field.Value(), defs)
-			name := getFieldName(field)
-			if fsch != nil {
-				fsch.ID = name
-				fsch.Description = getFieldDescription(field)
-				result.Properties[name] = *fsch
-			}
-		}
-		defs[id] = *result
-		return result
-	case reflect.Slice, reflect.Array:
-		sch := &spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"array"},
-			},
-		}
-
-		elem := reflect.TypeOf(target).Elem()
-		if elem.Kind() == reflect.Ptr {
-			elem = elem.Elem()
-		}
-
-		sch.Items = &spec.SchemaOrArray{
-			Schema: inspectSchema(reflect.New(elem).Interface(), defs),
-		}
-
-		return sch
+	if result, err = getSchema(target, defs); err != nil {
+		panic(err)
 	}
 
 	return
