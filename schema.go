@@ -23,7 +23,14 @@ func init() {
 			typ = typ.Elem()
 		}
 
-		return registry.getSchema(reflect.New(typ), d)
+		sch, err = registry.getSchema(reflect.New(typ).Elem().Interface(), d)
+		if err != nil {
+			return
+		}
+
+		sch.Nullable = true
+
+		return sch, nil
 	}, reflect.Ptr)
 
 	// register integer kinds
@@ -51,12 +58,19 @@ func init() {
 		result := spec.RefSchema(id)
 		result.ID = id
 		result.Properties = spec.SchemaProperties{}
-
 		ss := structs.New(i)
 		for _, field := range ss.Fields() {
+			if !isFieldAvailable(field) {
+				continue
+			}
 
-			// now get each field
-			_ = field
+			name := getFieldName(field)
+			sch, err := registry.getSchema(field.Value(), definitions)
+			if err != nil {
+				return nil, err
+			}
+
+			result.Properties[name] = *sch
 		}
 		return result, nil
 	}, reflect.Struct)
@@ -119,18 +133,12 @@ func (s *schemaRegistry) getSchema(target interface{}, defs spec.Definitions) (*
 	defer s.mutex.RUnlock()
 
 	typ := reflect.TypeOf(target)
-	required := true
-	for typ.Kind() == reflect.Ptr {
-		required = false
-		typ = typ.Elem()
-	}
 
 	if found, ok := s.storage[typ]; ok {
 		result, err := found(s, target, defs)
 		if err != nil {
 			return nil, err
 		}
-		result.Nullable = !required
 		return result, nil
 	}
 

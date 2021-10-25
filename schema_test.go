@@ -58,11 +58,19 @@ func TestSchema(t *testing.T) {
 
 	t.Run("test defined kinds", func(t *testing.T) {
 		type ExampleSchema struct {
-			IntValue int
+			IntValue    int
+			IntPtrValue *int `json:"int_ptr_value"`
 		}
 		sch, err := getSchema(&ExampleSchema{}, make(spec.Definitions))
 		assert.NoError(t, err)
 		assert.NotNil(t, sch)
+		assert.Equal(t, len(sch.Properties), 2)
+
+		assert.Equal(t, sch.Properties["IntValue"].Type, spec.StringOrArray{"integer"})
+		assert.Equal(t, sch.Properties["IntValue"].Nullable, false)
+		assert.Equal(t, sch.Properties["int_ptr_value"].Type, spec.StringOrArray{"integer"})
+		assert.Equal(t, sch.Properties["int_ptr_value"].Nullable, true)
+
 	})
 
 }
