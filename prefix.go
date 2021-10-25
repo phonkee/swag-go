@@ -83,7 +83,13 @@ func (p *prefix) Response(status int, response interface{}, options ...*Response
 	var opts *ResponseOptions
 	if len(options) > 0 && options[0] != nil {
 		opts = options[0]
+	} else {
+		opts = &ResponseOptions{}
 	}
+	// set defaults
+	opts.Defaults()
+
+	// overwrite old response
 	p.responses[status] = newResponse(status, response, opts)
 	return p
 }
