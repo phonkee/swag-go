@@ -75,7 +75,7 @@ func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
 		Method:      method,
 		Definitions: s.definitions,
 		Options:     opts,
-		Invalidate:  func() { s.once.Reset() },
+		Invalidate:  s.invalidate,
 		Swagger:     s,
 	})
 
@@ -98,10 +98,8 @@ func (s *swagger) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
 		resetCache: func() {
 			s.once.Reset()
 		},
-		responses: map[int]*response{},
-		invalidate: func() {
-			s.once.Reset()
-		},
+		responses:  map[int]*response{},
+		invalidate: s.invalidate,
 	}, opts)
 }
 
@@ -195,4 +193,8 @@ func (s *swagger) spec() *spec.Swagger {
 		}
 	})
 	return &s.specification
+}
+
+func (s *swagger) invalidate() {
+	s.once.Reset()
 }
