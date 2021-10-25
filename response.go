@@ -23,7 +23,13 @@ type response struct {
 }
 
 func newResponse(status int, target interface{}, options *ResponseOptions) *response {
+	if options == nil {
+		options = &ResponseOptions{}
+	}
+	// set defaults
 	options.Defaults()
+
+	// return response
 	return &response{
 		options: options,
 		status:  status,

@@ -132,7 +132,7 @@ func (s *swagger) spec() *spec.Swagger {
 				Swagger:  "2.0",
 				Consumes: []string{"application/json"},
 				Produces: []string{"application/json"},
-				Schemes:  []string{"http", "https"},
+				Schemes:  []string{"https"},
 				Info: &spec.Info{
 					InfoProps: spec.InfoProps{
 						Description: s.options.Description,
@@ -143,8 +143,8 @@ func (s *swagger) spec() *spec.Swagger {
 						Version: s.options.Version,
 					},
 				},
-				Host:     "some.api.out.there",
-				BasePath: "/",
+				// Host:     "some.api.out.there",
+				// BasePath: "",
 				Paths: &spec.Paths{
 					VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
 					Paths:            map[string]spec.PathItem{},
@@ -153,7 +153,9 @@ func (s *swagger) spec() *spec.Swagger {
 		}
 
 		for _, p := range s.paths {
-			spew.Dump(p)
+
+			spew.Dump(p.spec())
+
 			for k, v := range p.spec().Paths {
 				if _, ok := s.specification.Paths.Paths[k]; !ok {
 					s.specification.Paths.Paths[k] = spec.PathItem{

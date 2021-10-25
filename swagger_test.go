@@ -87,8 +87,11 @@ func TestPrefix(t *testing.T) {
 			_ = spe.Paths["/api/v1/user"]
 		})
 
-		swg.Debug()
+		data, err := json.MarshalIndent(swg, "  ", "  ")
+		assert.NoError(t, err)
+		println(string(data))
 
+		//swg.Debug()
 		//spew.Dump(spe.Paths["/api/v1/user"])
 	})
 }
