@@ -68,15 +68,19 @@ func init() {
 }
 ```
 
-We have also ability to have shared common properties:
+# prefix
+
+We have also ability to have shared common properties by creating prefixes.
+Prefixes share Responses, Path Params, Query Params and of course path prefix.
 
 ```go
 ApiV1 := Service.Prefix("/api/v1/").
 	Response(http.StatusNotFound, nil).
+    Response(http.StatusUnauthorized, nil).
 	Response(http.StatusInternalServerError, ErrorResponse{})
 ```
 
-And even this:
+And even this more complicated example works:
 
 ```go
 type UserIdentifierPathQuery struct {

@@ -11,6 +11,11 @@ type PathOptions struct {
 	Description string
 	ID          string
 	Tags        []string
+	Deprecated  bool
+}
+
+func (p *PathOptions) Defaults() {
+
 }
 
 type PathProvider interface {
@@ -20,7 +25,7 @@ type PathProvider interface {
 
 type PrefixProvider interface {
 	// Prefix adds ability to group endpoints and have common properties (response, query params, path params)
-	Prefix(path string) Prefix
+	Prefix(path string, options ...*PrefixOptions) Prefix
 }
 
 // Swagger is main interface
@@ -32,8 +37,10 @@ type Swagger interface {
 	PathProvider
 	PrefixProvider
 
-	// Spec returns spec and caches it
-	Spec() *spec.Swagger
+	Debug()
+
+	// spec returns specification and caches it
+	spec() *spec.Swagger
 
 	// private methods
 	addPath(*path)
@@ -53,8 +60,8 @@ type Path interface {
 	// if no response is provided, no body is defined, if only nil is passed all previous responses defined will be removed)
 	Response(status int, response interface{}, options ...*ResponseOptions) Path
 
-	// Spec returns spec compatible Paths
-	Spec() spec.Paths
+	// Spec returns specification compatible Paths
+	spec() spec.Paths
 }
 
 // Prefix TODO: implement prefix in future

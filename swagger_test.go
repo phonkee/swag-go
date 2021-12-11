@@ -57,3 +57,40 @@ func TestNew(t *testing.T) {
 	assert.NoError(t, err)
 	_ = b
 }
+
+type TestParamsParams struct {
+	Str string
+}
+
+func TestParams(t *testing.T) {
+	t.Run("simple params", func(t *testing.T) {
+		swg := New("hello")
+		swg.Path("/hello", http.MethodGet).
+			PathParams(TestParamsParams{})
+	})
+}
+
+func TestPrefix(t *testing.T) {
+	t.Run("test prefix", func(t *testing.T) {
+		swg := New("hello")
+		swgPrefix := swg.Prefix("/api/v1").
+			Response(http.StatusTeapot, nil)
+		swgUserPrefix := swgPrefix.Prefix("user")
+		p := swgUserPrefix.Path("", http.MethodGet).
+			Response(http.StatusNotFound, nil).
+			Response(http.StatusUnauthorized, nil)
+
+		// get specs
+		spe := p.(*path).spec()
+		assert.Equal(t, 1, len(spe.Paths))
+		assert.NotPanics(t, func() {
+			_ = spe.Paths["/api/v1/user"]
+		})
+
+		data, err := json.MarshalIndent(swg, "  ", "  ")
+		assert.NoError(t, err)
+		println(string(data))
+
+		//swg.Debug()
+	})
+}
