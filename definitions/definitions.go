@@ -102,10 +102,12 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 			}
 			if field.IsEmbedded() {
 				panic("embedded structs are not supported yet")
+				// here we need to call Register on this field, then iterate over all fields, add them to this struct,
+				// and then delete this type from spec definitions (we don't want to pollute it)
 			}
 			name := utils.GetFieldName(field)
 
-			// we need to handle pointer type here
+			// we need to handle pointer type here by ourselves, since reflect.New is strict about it
 			ptr := false
 			fieldType := reflect.TypeOf(field.Value())
 			for {
@@ -117,11 +119,11 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 				}
 			}
 
-			regged := d.Register(reflect.New(fieldType).Interface())
+			fr := d.Register(reflect.New(fieldType).Interface())
 			if ptr {
-				regged.Nullable = true
+				fr.Nullable = true
 			}
-			result.Properties[name] = regged
+			result.Properties[name] = fr
 		}
 	}
 
