@@ -7,17 +7,6 @@ import (
 	"github.com/go-openapi/spec"
 )
 
-type PathOptions struct {
-	Description string
-	ID          string
-	Tags        []string
-	Deprecated  bool
-}
-
-func (p *PathOptions) Defaults() {
-
-}
-
 type PathProvider interface {
 	// Path adds new endpoints
 	Path(path string, method string, options ...*PathOptions) Path

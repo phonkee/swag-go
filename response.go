@@ -12,6 +12,9 @@ type ResponseOptions struct {
 }
 
 func (r *ResponseOptions) Defaults() {
+	if r == nil {
+		*r = ResponseOptions{}
+	}
 	r.Description = strings.TrimSpace(r.Description)
 }
 

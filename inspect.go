@@ -32,12 +32,10 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 
 		format := fn(name).WithDescription(description)
 
-
 		val := reflect.ValueOf(target)
 		for val.Type().Kind() == reflect.Ptr {
 			val = val.Elem()
 		}
-
 
 		var (
 			err error
@@ -94,7 +92,7 @@ func inspectParams(target interface{}, fn func(name string) *spec.Parameter) []*
 	return result
 }
 
-// inspectSchema inspects target and returns Schema
+// inspectSchema inspects target and returns Definitions
 func inspectSchema(target interface{}, defs spec.Definitions) (result *spec.Schema) {
 	var err error
 

@@ -20,11 +20,11 @@ func init() {
 }
 
 type GetPetPathParams struct {
-	ID int `json:"id" swag_description:"primary key in pets database"`
+	ID int `json:"id" swag:"description='primary key in pets database'"`
 }
 
 type Pet struct {
-	ID int `json:"id" swag_description:"unique identifier in database"`
+	ID int `json:"id" swag:"description:'unique identifier in database'"`
 	Name string `json:"name"`
 	Born time.Time `json:"born"`
 }
@@ -34,7 +34,7 @@ type ErrorResponse struct {
 }
 
 type CreatePetSerializer struct {
-	Name string `json:"name" swag_description:"Name of your pet"`
+	Name string `json:"name" swag:"description='Name of your pet'"`
 }
 
 type FieldValidationError struct {
@@ -42,7 +42,7 @@ type FieldValidationError struct {
 }
 
 type FilterPetsQuery struct {
-	Dogs bool `json:"dogs" swag_description:"only dogs will be returned"`
+	Dogs bool `json:"dogs" swag:"description:'only dogs will be returned'"`
 }
 
 func init() {

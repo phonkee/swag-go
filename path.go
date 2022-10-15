@@ -10,6 +10,17 @@ import (
 	"github.com/go-openapi/spec"
 )
 
+type PathOptions struct {
+	Description string
+	ID          string
+	Tags        []string
+	Deprecated  bool
+}
+
+func (p *PathOptions) Defaults() {
+
+}
+
 type pathInfo struct {
 	Path        string
 	Method      string
@@ -212,7 +223,7 @@ func (p *path) operation() *spec.Operation {
 		_ = response
 		result.OperationProps.Responses.ResponsesProps.StatusCodeResponses[status] = spec.Response{
 			ResponseProps: spec.ResponseProps{
-				Description: "",
+				Description: "asdf",
 				Schema:      nil,
 				Headers:     nil,
 				Examples:    nil,
