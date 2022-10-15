@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/spec"
+	"github.com/phonkee/swag-go/definitions"
 )
 
 type PathProvider interface {
@@ -27,6 +28,9 @@ type Swagger interface {
 	PrefixProvider
 
 	Debug()
+
+	// Definitions exposes definitions to be able to define custom types
+	Definitions() definitions.Definitions
 
 	// spec returns specification and caches it
 	spec() *spec.Swagger
