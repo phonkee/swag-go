@@ -12,7 +12,7 @@ import (
 )
 
 // New instantiates new definitions
-func New() Definitions {
+func New() Interface {
 	result := &definitions{
 		definitions: make(spec.Definitions),
 		types:       make(map[reflect.Type]func(schema *spec.Schema)),
@@ -27,7 +27,7 @@ func New() Definitions {
 	return result
 }
 
-// definitions implements Definitions interface
+// definitions implements Interface interface
 type definitions struct {
 	definitions spec.Definitions
 	types       map[reflect.Type]func(schema *spec.Schema)

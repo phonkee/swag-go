@@ -30,7 +30,7 @@ type Swagger interface {
 	Debug()
 
 	// Definitions exposes definitions to be able to define custom types
-	Definitions() definitions.Definitions
+	Definitions() definitions.Interface
 
 	// spec returns specification and caches it
 	spec() *spec.Swagger

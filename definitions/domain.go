@@ -6,7 +6,7 @@ import (
 	"github.com/go-openapi/spec"
 )
 
-type Definitions interface {
+type Interface interface {
 	Register(what interface{}) spec.Schema
 	RegisterType(what reflect.Type, fn func(schema *spec.Schema))
 	Spec() spec.Definitions
