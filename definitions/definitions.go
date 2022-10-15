@@ -101,9 +101,15 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 				continue
 			}
 			if field.IsEmbedded() {
-				panic("embedded structs are not supported yet")
 				// here we need to call Register on this field, then iterate over all fields, add them to this struct,
 				// and then delete this type from spec definitions (we don't want to pollute it)
+
+				emb := d.Register(field.Value())
+				for name, field := range emb.Properties {
+					result.Properties[name] = field
+				}
+				delete(d.definitions, emb.ID)
+				continue
 			}
 			name := utils.GetFieldName(field)
 
@@ -137,6 +143,13 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 // Warning! This makes it higher priority than any other type.
 // Warning! you cannot make different implementation for pointer. Pointer is handled by default.
 func (d *definitions) RegisterType(what reflect.Type, fn func(schema *spec.Schema)) {
+	for {
+		if what.Kind() == reflect.Ptr {
+			what = what.Elem()
+		} else {
+			break
+		}
+	}
 	d.types[what] = fn
 }
 

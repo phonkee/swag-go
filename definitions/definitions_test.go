@@ -10,6 +10,18 @@ import (
 )
 
 func TestDefinitions(t *testing.T) {
+
+	t.Run("test embedded struct", func(t *testing.T) {
+		type Else struct {
+			ID int `json:"id"`
+		}
+		type Something struct {
+			Else
+		}
+		sch := New().Register(Something{})
+		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["id"].Type)
+	})
+
 	t.Run("test struct", func(t *testing.T) {
 		type _SomethingTesting struct {
 			// test here
@@ -26,23 +38,28 @@ func TestDefinitions(t *testing.T) {
 	t.Run("test custom type", func(t *testing.T) {
 		type Custom struct {
 		}
-		d := New()
-		d.RegisterType(reflect.TypeOf(Custom{}), func(schema *spec.Schema) {
-			schema.Type = []string{"custom"}
-		})
-		for _, item := range []struct {
-			in       interface{}
-			id       string
-			nullable bool
-		}{
-			{Custom{}, "definitions.Custom", false},
-			{&Custom{}, "definitions.Custom", true},
-		} {
-			regged := d.Register(item.in)
-			assert.Equal(t, spec.StringOrArray{"custom"}, regged.Type)
-			assert.Equal(t, item.id, regged.Ref.String())
-			assert.Equal(t, item.nullable, regged.Nullable)
+
+		for _, regType := range []any{Custom{}, &Custom{}} {
+			d := New()
+			d.RegisterType(reflect.TypeOf(regType), func(schema *spec.Schema) {
+				schema.Type = []string{"custom"}
+			})
+
+			for _, item := range []struct {
+				in       interface{}
+				id       string
+				nullable bool
+			}{
+				{Custom{}, "definitions.Custom", false},
+				{&Custom{}, "definitions.Custom", true},
+			} {
+				regged := d.Register(item.in)
+				assert.Equal(t, spec.StringOrArray{"custom"}, regged.Type)
+				assert.Equal(t, item.id, regged.Ref.String())
+				assert.Equal(t, item.nullable, regged.Nullable)
+			}
 		}
+
 	})
 
 	t.Run("test basic types", func(t *testing.T) {
