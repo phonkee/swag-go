@@ -37,7 +37,7 @@ func New(title string, options ...*Options) Swagger {
 	return &swagger{
 		title:       title,
 		options:     opts,
-		definitions: make(spec.Definitions),
+		definitions: definitions.New(),
 		paths:       make([]*path, 0),
 	}
 }
