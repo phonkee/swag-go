@@ -10,6 +10,19 @@ import (
 )
 
 func TestDefinitions(t *testing.T) {
+	t.Run("test struct", func(t *testing.T) {
+		type _SomethingTesting struct {
+			// test here
+			ID      *int `json:"id,omitempty"`
+			Ignored *int `json:"-"`
+		}
+		d := New()
+		sch := d.Register(_SomethingTesting{})
+		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["id"].Type)
+		_, ok := sch.Properties["Ignored"]
+		assert.False(t, ok)
+	})
+
 	t.Run("test custom type", func(t *testing.T) {
 		type Custom struct {
 		}
@@ -30,7 +43,6 @@ func TestDefinitions(t *testing.T) {
 			assert.Equal(t, item.id, regged.Ref.String())
 			assert.Equal(t, item.nullable, regged.Nullable)
 		}
-
 	})
 
 	t.Run("test basic types", func(t *testing.T) {

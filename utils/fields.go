@@ -13,3 +13,14 @@ func GetFieldName(field *structs.Field) string {
 	}
 	return result
 }
+
+func IsFieldAvailable(field *structs.Field) bool {
+	if tag := strings.TrimSpace(field.Tag("json")); tag != "" {
+		for _, part := range strings.Split(tag, ",") {
+			if part == "-" {
+				return false
+			}
+		}
+	}
+	return true
+}

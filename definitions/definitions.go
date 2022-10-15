@@ -6,7 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fatih/structs"
 	"github.com/go-openapi/spec"
+	"github.com/phonkee/swag-go/utils"
 )
 
 // New instantiates new definitions
@@ -86,7 +88,41 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 			Schema: &tmp,
 		}
 	case reflect.Struct:
-		// now do the magic
+		// TODO: add support for embedded structs
+		result.Type = []string{"object"}
+		result.Properties = spec.SchemaProperties{}
+
+		// now iterate over all fields, decide which needs to be added (json tags used)
+		for _, field := range structs.New(what).Fields() {
+			if !utils.IsFieldAvailable(field) {
+				continue
+			}
+			if !field.IsExported() {
+				continue
+			}
+			if field.IsEmbedded() {
+				panic("embedded structs are not supported yet")
+			}
+			name := utils.GetFieldName(field)
+
+			// we need to handle pointer type here
+			ptr := false
+			fieldType := reflect.TypeOf(field.Value())
+			for {
+				if fieldType.Kind() == reflect.Ptr {
+					ptr = true
+					fieldType = fieldType.Elem()
+				} else {
+					break
+				}
+			}
+
+			regged := d.Register(reflect.New(fieldType).Interface())
+			if ptr {
+				regged.Nullable = true
+			}
+			result.Properties[name] = regged
+		}
 	}
 
 	// assign to definitions
