@@ -61,22 +61,30 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 
 	// now check for type
 	switch typ.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		// mixing int and uint
 		result.Type = []string{"integer"}
 		switch typ.Kind() {
-		case reflect.Int:
+		case reflect.Int, reflect.Uint:
 			result.Format = "int" + strconv.FormatInt(int64(typ.Bits()), 10)
-		case reflect.Int8:
+		case reflect.Int8, reflect.Uint8:
 			result.Format = "int8"
-		case reflect.Int16:
+		case reflect.Int16, reflect.Uint16:
 			result.Format = "int16"
-		case reflect.Int32:
+		case reflect.Int32, reflect.Uint32:
 			result.Format = "int32"
-		case reflect.Int64:
+		case reflect.Int64, reflect.Uint64:
 			result.Format = "int64"
 		default:
 			panic(fmt.Sprintf("don't know how to handle this type: %v", what))
 		}
+	case reflect.Float32:
+		result.Type = []string{"number"}
+		result.Format = "float"
+	case reflect.Float64:
+		result.Type = []string{"number"}
+		result.Format = "double"
 	case reflect.String:
 		result.Type = []string{"string"}
 	case reflect.Bool:
@@ -88,7 +96,6 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 			Schema: &tmp,
 		}
 	case reflect.Struct:
-		// TODO: add support for embedded structs
 		result.Type = []string{"object"}
 		result.Properties = spec.SchemaProperties{}
 
@@ -131,6 +138,8 @@ func (d *definitions) Register(what interface{}) spec.Schema {
 			}
 			result.Properties[name] = fr
 		}
+	default:
+		panic(fmt.Sprintf("don't know how to handle this type: %v", what))
 	}
 
 	// assign to definitions

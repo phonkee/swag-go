@@ -3,7 +3,7 @@ package swag
 import (
 	"strings"
 
-	"github.com/go-openapi/spec"
+	"github.com/phonkee/swag-go/definitions"
 )
 
 // TODO: prefix is not implemented yet, should not be very complicated though
@@ -19,7 +19,7 @@ func (p *PrefixOptions) Defaults() {
 }
 
 type prefixInfo struct {
-	definitions spec.Definitions
+	definitions definitions.Interface
 	swagger     *swagger
 	pathPrefix  string
 	resetCache  func()

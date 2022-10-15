@@ -8,6 +8,7 @@ import (
 
 	"github.com/fatih/structs"
 	"github.com/go-openapi/spec"
+	"github.com/phonkee/swag-go/definitions"
 )
 
 type PathOptions struct {
@@ -24,7 +25,7 @@ func (p *PathOptions) Defaults() {
 type pathInfo struct {
 	Path        string
 	Method      string
-	Definitions spec.Definitions
+	Definitions definitions.Interface
 	Options     *PathOptions
 	Invalidate  func()
 	Swagger     *swagger

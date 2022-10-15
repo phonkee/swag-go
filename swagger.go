@@ -7,6 +7,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-openapi/spec"
 	"github.com/matryer/resync"
+	"github.com/phonkee/swag-go/definitions"
 )
 
 type Options struct {
@@ -46,10 +47,14 @@ type swagger struct {
 	title         string
 	specification spec.Swagger
 	options       *Options
-	definitions   spec.Definitions
+	definitions   definitions.Interface
 	once          resync.Once
 	cached        *spec.Swagger
 	paths         []*path
+}
+
+func (s *swagger) Definitions() definitions.Interface {
+	return s.definitions
 }
 
 func (s *swagger) Debug() {

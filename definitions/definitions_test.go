@@ -25,14 +25,22 @@ func TestDefinitions(t *testing.T) {
 	t.Run("test struct", func(t *testing.T) {
 		type _SomethingTesting struct {
 			// test here
-			ID      *int `json:"id,omitempty"`
-			Ignored *int `json:"-"`
+			ID          *int `json:"id,omitempty"`
+			Ignored     *int `json:"-"`
+			notExported *int
 		}
 		d := New()
 		sch := d.Register(_SomethingTesting{})
 		assert.Equal(t, spec.StringOrArray{"integer"}, sch.Properties["id"].Type)
 		_, ok := sch.Properties["Ignored"]
 		assert.False(t, ok)
+	})
+
+	t.Run("test unsupported type", func(t *testing.T) {
+		assert.Panics(t, func() {
+			New().Register(map[string]string{})
+		})
+
 	})
 
 	t.Run("test custom type", func(t *testing.T) {
@@ -77,6 +85,11 @@ func TestDefinitions(t *testing.T) {
 			{in: int16(1), typ: "integer", format: "int16"},
 			{in: int32(1), typ: "integer", format: "int32"},
 			{in: int64(1), typ: "integer", format: "int64"},
+			{in: uint(1), typ: "integer", format: "int64"}, // assume we are on 64 bit
+			{in: uint8(1), typ: "integer", format: "int8"},
+			{in: uint16(1), typ: "integer", format: "int16"},
+			{in: uint32(1), typ: "integer", format: "int32"},
+			{in: uint64(1), typ: "integer", format: "int64"},
 			{in: "hello", typ: "string"},
 			{in: true, typ: "boolean"},
 			{in: false, typ: "boolean"},
