@@ -31,7 +31,7 @@ type TestResponse struct {
 
 func TestNew(t *testing.T) {
 	swg := New("Pet store", &Options{
-		Description: "Pet store swagger implementation",
+		Description: "Pet store swag implementation",
 		Version:     "1.0.0",
 		License: &License{
 			Name: "MIT",

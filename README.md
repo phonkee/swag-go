@@ -26,7 +26,7 @@ type GetPetPathParams struct {
 type Pet struct {
 	ID int `json:"id" swag:"description:'unique identifier in database'"`
 	Name string `json:"name"`
-	Born time.Time `json:"born"`
+	Birthdate time.Time `json:"birth_date"`
 }
 
 type ErrorResponse struct {
@@ -92,7 +92,7 @@ type Order struct {
 }
 
 type OrderCacheQueryParams struct {
-	NoCache bool `json:"no_cache" swag_description:"when true, orders will be fetched from database"`
+	NoCache bool `json:"no_cache" swag:"descritpion='when true, orders will be fetched from database'"`
 }
 
 func init() {

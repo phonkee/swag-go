@@ -9,18 +9,9 @@ import (
 // TODO: prefix is not implemented yet, should not be very complicated though
 // Currently it's lower priority but soon it will be implemented
 
-type PrefixOptions struct {
-	// always provided description (other will be appended)
-	Description string
-}
-
-// Defaults sets default values correctly (even fix invalid values)
-func (p *PrefixOptions) Defaults() {
-}
-
 type prefixInfo struct {
 	definitions definitions.Interface
-	swagger     *swagger
+	swagger     *swag
 	pathPrefix  string
 	resetCache  func()
 	responses   map[int]*response
@@ -143,5 +134,4 @@ func (p *prefix) copy(pathPrefix string, options ...*PrefixOptions) Prefix {
 	}
 
 	return result
-
 }

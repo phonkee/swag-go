@@ -11,24 +11,13 @@ import (
 	"github.com/phonkee/swag-go/definitions"
 )
 
-type PathOptions struct {
-	Description string
-	ID          string
-	Tags        []string
-	Deprecated  bool
-}
-
-func (p *PathOptions) Defaults() {
-
-}
-
 type pathInfo struct {
 	Path        string
 	Method      string
 	Definitions definitions.Interface
 	Options     *PathOptions
 	Invalidate  func()
-	Swagger     *swagger
+	Swagger     *swag
 	responses   map[int]*response
 }
 

@@ -10,22 +10,7 @@ import (
 	"github.com/phonkee/swag-go/definitions"
 )
 
-type Options struct {
-	Description string
-	Version     string
-	Host        string
-	License     *License
-	Contact     *ContactInfo
-}
-
-// Defaults fill blank values
-func (s *Options) Defaults() {
-	if s.Version == "" {
-		s.Version = DefaultVersion
-	}
-}
-
-// New returns new swagger
+// New returns new swag
 func New(title string, options ...*Options) Swagger {
 	var opts *Options
 	if len(options) > 0 && options[0] != nil {
@@ -34,7 +19,7 @@ func New(title string, options ...*Options) Swagger {
 		opts = &Options{}
 	}
 	opts.Defaults()
-	return &swagger{
+	return &swag{
 		title:       title,
 		options:     opts,
 		definitions: definitions.New(),
@@ -42,8 +27,8 @@ func New(title string, options ...*Options) Swagger {
 	}
 }
 
-// swagger implementation of Swagger
-type swagger struct {
+// swag implementation of Swagger
+type swag struct {
 	title         string
 	specification spec.Swagger
 	options       *Options
@@ -53,27 +38,27 @@ type swagger struct {
 	paths         []*path
 }
 
-func (s *swagger) Definitions() definitions.Interface {
+func (s *swag) Definitions() definitions.Interface {
 	return s.definitions
 }
 
-func (s *swagger) Debug() {
+func (s *swag) Debug() {
 	for _, p := range s.paths {
 		println("path", spew.Sdump(p))
 	}
 }
 
-func (s *swagger) addPath(p *path) {
+func (s *swag) addPath(p *path) {
 	s.paths = append(s.paths, p)
 }
 
 // MarshalJSON marshals into json and caches result
-func (s *swagger) MarshalJSON() (response []byte, err error) {
+func (s *swag) MarshalJSON() (response []byte, err error) {
 	return json.Marshal(s.spec())
 }
 
 // Path returns path
-func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
+func (s *swag) Path(p string, method string, options ...*PathOptions) Path {
 	// reset generated thing
 	s.once.Reset()
 
@@ -91,14 +76,14 @@ func (s *swagger) Path(p string, method string, options ...*PathOptions) Path {
 		Swagger:     s,
 	})
 
-	// add path to swagger
+	// add path to swag
 	s.addPath(np)
 
 	return np
 }
 
 // Prefix returns prefixed prefix
-func (s *swagger) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
+func (s *swag) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
 	var opts *PrefixOptions
 	if len(options) > 0 && options[0] != nil {
 		opts = options[0]
@@ -116,7 +101,7 @@ func (s *swagger) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
 }
 
 // ServeHTTP gives ability to use it in net/http
-func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (s *swag) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(writer).Encode(s); err != nil {
@@ -125,9 +110,9 @@ func (s *swagger) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// spec returns specification swagger
+// spec returns specification swag
 // TODO: finish this
-func (s *swagger) spec() *spec.Swagger {
+func (s *swag) spec() *spec.Swagger {
 	// only once please
 	s.once.Do(func() {
 		s.specification = spec.Swagger{
@@ -140,12 +125,12 @@ func (s *swagger) spec() *spec.Swagger {
 				Schemes:  []string{"https"},
 				Info: &spec.Info{
 					InfoProps: spec.InfoProps{
-						Description: s.options.Description,
-						Title:       s.title,
-						//TermsOfService: "",
-						Contact: s.options.Contact.Spec(),
-						License: s.options.License.Spec(),
-						Version: s.options.Version,
+						Description:    s.options.Description,
+						Title:          s.title,
+						TermsOfService: s.options.TermsOfServices,
+						Contact:        s.options.Contact.Spec(),
+						License:        s.options.License.Spec(),
+						Version:        s.options.Version,
 					},
 				},
 				// Host:     "some.api.out.there",
@@ -180,6 +165,6 @@ func (s *swagger) spec() *spec.Swagger {
 	return &s.specification
 }
 
-func (s *swagger) invalidate() {
+func (s *swag) invalidate() {
 	s.once.Reset()
 }

@@ -1,22 +1,8 @@
 package swag
 
 import (
-	"strings"
-
 	"github.com/go-openapi/spec"
 )
-
-type ResponseOptions struct {
-	Description string
-	Deprecated  bool
-}
-
-func (r *ResponseOptions) Defaults() {
-	if r == nil {
-		*r = ResponseOptions{}
-	}
-	r.Description = strings.TrimSpace(r.Description)
-}
 
 type response struct {
 	options *ResponseOptions
