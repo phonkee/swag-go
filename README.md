@@ -84,7 +84,9 @@ And even this more complicated example works:
 
 ```go
 type UserIdentifierPathQuery struct {
-	ID int `json:"id" swag:"description='user identifier'"`
+	// in this case we use user_id, if there was no definition, we have a look into json (if disabled we do not use field)
+	// if json does not have custom name, we use field name
+	ID int `json:"id" swag:"name=user_id, description='user identifier'"`
 }
 
 type Order struct {
