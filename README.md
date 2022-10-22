@@ -83,7 +83,7 @@ ApiV1 := Service.Prefix("/api/v1/").
 And even this more complicated example works:
 
 ```go
-type UserIdentifierPathQuery struct {
+type UserIdentifierPathParams struct {
 	// in this case we use user_id, if there was no definition, we have a look into json (if disabled we do not use field)
 	// if json does not have custom name, we use field name
 	ID int `json:"id" swag:"name=user_id, description='user identifier'"`
@@ -101,7 +101,7 @@ func init() {
     // prepare prefix that identifies user by id
 	UsersOrdersApiV1 := ApiV1.Prefix("users/{user_id}/orders").
 		// path params will be inherited in all paths derived from this prefix
-		PathParams(UserIdentifierPathQuery{}).
+		PathParams(UserIdentifierPathParams{}).
 		// query params will be inherited in all paths derived from this prefix 
 		QueryParams(OrderCacheQueryParams{}).
         // responses will be inherited in all paths derived from this prefix
