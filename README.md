@@ -97,7 +97,7 @@ type OrderCacheQueryParams struct {
 
 func init() {
     // prepare prefix that identifies user by id
-	UsersOrdersApiV1 := Service.Prefix("/api/v1/users/{id}/orders").
+	UsersOrdersApiV1 := ApiV1.Prefix("users/{id}/orders").
 		// path params will be inherited in all paths derived from this prefix
 		PathParams(UserIdentifierPathQuery{}).
 		// query params will be inherited in all paths derived from this prefix 
@@ -116,6 +116,9 @@ func init() {
 }
 
 ```
+
+# todo:
+- definitions - add RegisterCustomType that registers type and result of raw swag spec (custom types)
 
 
 # author
