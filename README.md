@@ -84,7 +84,7 @@ And even this more complicated example works:
 
 ```go
 type UserIdentifierPathQuery struct {
-	ID int `json:"id"`
+	ID int `json:"id" swag:"description='user identifier'"`
 }
 
 type Order struct {
