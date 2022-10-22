@@ -99,7 +99,7 @@ type OrderCacheQueryParams struct {
 
 func init() {
     // prepare prefix that identifies user by id
-	UsersOrdersApiV1 := ApiV1.Prefix("users/{id}/orders").
+	UsersOrdersApiV1 := ApiV1.Prefix("users/{user_id}/orders").
 		// path params will be inherited in all paths derived from this prefix
 		PathParams(UserIdentifierPathQuery{}).
 		// query params will be inherited in all paths derived from this prefix 
