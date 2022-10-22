@@ -88,7 +88,7 @@ type UserIdentifierPathQuery struct {
 }
 
 type Order struct {
-	ID int `json:"id"`
+	ID int `json:"id" swag:"description='order primary key'"`
 }
 
 type OrderCacheQueryParams struct {
