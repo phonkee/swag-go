@@ -1,30 +1,32 @@
 package swag
 
-import (
-	"github.com/go-openapi/spec"
-)
+type Responses map[int]*response
+
+func (r Responses) Clone() Responses {
+	result := make(Responses, len(r))
+	for k, v := range r {
+		result[k] = v
+	}
+	return result
+}
 
 type response struct {
 	options *ResponseOptions
 	status  int
-	target  interface{}
 }
 
-func newResponse(status int, target interface{}, options *ResponseOptions) *response {
-	if options == nil {
-		options = &ResponseOptions{}
-	}
-	// set defaults
-	options.Defaults()
-
-	// return response
-	return &response{
-		options: options,
-		status:  status,
-		target:  target,
-	}
+func (s *swag) Response(status int, response interface{}, options ...*ResponseOptions) Swag {
+	// TODO: add here
+	return s
 }
 
-func (r *response) spec() *spec.Response {
-	return &spec.Response{}
+func (p *pathImpl) Response(status int, what interface{}, options ...*ResponseOptions) Path {
+	//opts := defaultResponseOptions().Merge(options...)
+	// TODO: add response here
+	return p
+}
+
+func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Prefix {
+	// TODO: implement me
+	return p
 }

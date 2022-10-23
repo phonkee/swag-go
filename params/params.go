@@ -13,6 +13,7 @@ import (
 type Params interface {
 	// Add adds a parameter to the list of parameters, if nil is provided it removes all previous parameter
 	Add(value interface{})
+	Clone() Params
 	Spec() []spec.Parameter
 }
 
@@ -24,6 +25,14 @@ func New() Params {
 
 type params struct {
 	params []spec.Parameter
+}
+
+func (p *params) Clone() Params {
+	result := New().(*params)
+	for _, param := range p.params {
+		result.params = append(result.params, param)
+	}
+	return result
 }
 
 func (p *params) Add(value interface{}) {

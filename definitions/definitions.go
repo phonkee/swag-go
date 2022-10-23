@@ -12,7 +12,7 @@ import (
 )
 
 // New instantiates new definitions
-func New() Interface {
+func New() Definitions {
 	result := &definitions{
 		definitions: make(spec.Definitions),
 		types:       make(map[reflect.Type]func(schema *spec.Schema)),
@@ -27,7 +27,7 @@ func New() Interface {
 	return result
 }
 
-// definitions implements Interface interface
+// definitions implements Definitions interface
 type definitions struct {
 	definitions spec.Definitions
 	types       map[reflect.Type]func(schema *spec.Schema)
@@ -162,7 +162,8 @@ func (d *definitions) RegisterType(what reflect.Type, fn func(schema *spec.Schem
 	d.types[what] = fn
 }
 
-// Spec returns pointer to raw spec.Definitions
-func (d *definitions) Spec() spec.Definitions {
-	return d.definitions
+// UpdateSpec updates spec.Definitions with given one
+func (d *definitions) UpdateSpec(_ *spec.Swagger) error {
+	// TODO: add specs
+	return nil
 }

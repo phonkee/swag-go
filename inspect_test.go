@@ -27,10 +27,10 @@ func TestInspectParams(t *testing.T) {
 
 		assert.False(t, inspected[2].Required)
 
-		// try path param
+		// try pathImpl param
 		inspected = inspectParams(Some{}, spec.PathParam)
 		assert.NotNil(t, inspected)
-		assert.Equal(t, inspected[0].In, "path")
+		assert.Equal(t, inspected[0].In, "pathImpl")
 	})
 
 	t.Run("test required", func(t *testing.T) {

@@ -3,101 +3,44 @@ package swag
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-openapi/spec"
 	"github.com/matryer/resync"
 	"github.com/phonkee/swag-go/definitions"
 )
 
 // New returns new swag
-func New(title string, options ...*Options) Swagger {
-	var opts *Options
-	if len(options) > 0 && options[0] != nil {
-		opts = options[0]
-	} else {
-		opts = &Options{}
-	}
-	opts.Defaults()
+func New(title string, options ...*Options) Swag {
+	defs := definitions.New()
 	return &swag{
 		title:       title,
-		options:     opts,
-		definitions: definitions.New(),
-		paths:       make([]*path, 0),
+		options:     defaultOptions().Merge(options...),
+		definitions: defs,
+		responses:   make(Responses),
+		updaters:    make([]UpdateSpec, 0),
 	}
 }
 
-// swag implementation of Swagger
+// swag implementation of Swag
 type swag struct {
 	title         string
 	specification spec.Swagger
 	options       *Options
-	definitions   definitions.Interface
+	definitions   definitions.Definitions
 	once          resync.Once
 	cached        *spec.Swagger
-	paths         []*path
+	responses     Responses
+	updaters      []UpdateSpec
 }
 
-func (s *swag) Definitions() definitions.Interface {
-	return s.definitions
-}
-
+// no-op
 func (s *swag) Debug() {
-	for _, p := range s.paths {
-		println("path", spew.Sdump(p))
-	}
-}
-
-func (s *swag) addPath(p *path) {
-	s.paths = append(s.paths, p)
 }
 
 // MarshalJSON marshals into json and caches result
 func (s *swag) MarshalJSON() (response []byte, err error) {
 	return json.Marshal(s.spec())
-}
-
-// Path returns path
-func (s *swag) Path(p string, method string, options ...*PathOptions) Path {
-	// reset generated thing
-	s.once.Reset()
-
-	var opts *PathOptions
-	if len(options) > 0 && options[0] != nil {
-		opts = options[0]
-	}
-
-	np := newPath(&pathInfo{
-		Path:        p,
-		Method:      method,
-		Definitions: s.definitions,
-		Options:     opts,
-		Invalidate:  s.invalidate,
-		Swagger:     s,
-	})
-
-	// add path to swag
-	s.addPath(np)
-
-	return np
-}
-
-// Prefix returns prefixed prefix
-func (s *swag) Prefix(pathPrefix string, options ...*PrefixOptions) Prefix {
-	var opts *PrefixOptions
-	if len(options) > 0 && options[0] != nil {
-		opts = options[0]
-	}
-	return newPrefix(&prefixInfo{
-		definitions: s.definitions,
-		swagger:     s,
-		pathPrefix:  pathPrefix,
-		resetCache: func() {
-			s.once.Reset()
-		},
-		responses:  map[int]*response{},
-		invalidate: s.invalidate,
-	}, opts)
 }
 
 // ServeHTTP gives ability to use it in net/http
@@ -142,24 +85,14 @@ func (s *swag) spec() *spec.Swagger {
 			},
 		}
 
-		for _, p := range s.paths {
-
-			for k, v := range p.spec().Paths {
-				if _, ok := s.specification.Paths.Paths[k]; !ok {
-					s.specification.Paths.Paths[k] = spec.PathItem{
-						PathItemProps: spec.PathItemProps{
-							Parameters: []spec.Parameter{},
-						},
-					}
-				}
-
-				temp := s.specification.Paths.Paths[k]
-				if v.Get != nil {
-					temp.PathItemProps.Get = v.Get
-				}
-
-				s.specification.Paths.Paths[k] = temp
+		for _, updater := range s.updaters {
+			if err := updater.UpdateSpec(&s.specification); err != nil {
+				panic(err)
 			}
+		}
+
+		if s.definitions.UpdateSpec(&s.specification) != nil {
+			panic("cannot update definitions")
 		}
 	})
 	return &s.specification
@@ -167,4 +100,18 @@ func (s *swag) spec() *spec.Swagger {
 
 func (s *swag) invalidate() {
 	s.once.Reset()
+}
+
+// RegisterType registers type with custom marshalling
+func (s *swag) RegisterType(what interface{}, fn func(schema *spec.Schema)) {
+	s.definitions.RegisterType(reflect.TypeOf(what), fn)
+}
+
+func (s *swag) UpdateSpec(swagger *spec.Swagger) error {
+	for _, upd := range s.updaters {
+		if err := upd.UpdateSpec(swagger); err != nil {
+			return err
+		}
+	}
+	return nil
 }

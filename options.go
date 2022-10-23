@@ -1,7 +1,5 @@
 package swag
 
-import "strings"
-
 type Options struct {
 	Description     string
 	Version         string
@@ -11,11 +9,17 @@ type Options struct {
 	TermsOfServices string
 }
 
-// Defaults fill blank values
-func (s *Options) Defaults() {
-	if s.Version == "" {
-		s.Version = DefaultVersion
+func defaultOptions() *Options {
+	return &Options{
+		Version: DefaultVersion,
 	}
+}
+
+func (o *Options) Merge(opts ...*Options) *Options {
+	for _, opt := range opts {
+		_ = opt
+	}
+	return o
 }
 
 type PathOptions struct {
@@ -25,8 +29,15 @@ type PathOptions struct {
 	Deprecated  bool
 }
 
-func (p *PathOptions) Defaults() {
+func defaultPathOptions() *PathOptions {
+	return &PathOptions{}
+}
 
+func (p *PathOptions) Merge(others ...*PathOptions) *PathOptions {
+	for _, other := range others {
+		_ = other
+	}
+	return p
 }
 
 type PrefixOptions struct {
@@ -34,8 +45,19 @@ type PrefixOptions struct {
 	Description string
 }
 
-// Defaults sets default values correctly (even fix invalid values)
-func (p *PrefixOptions) Defaults() {
+func defaultPrefixOptions() *PrefixOptions {
+	return &PrefixOptions{}
+}
+
+func (p *PrefixOptions) Clone() *PrefixOptions {
+	return &*p
+}
+
+func (p *PrefixOptions) Merge(others ...*PrefixOptions) *PrefixOptions {
+	for _, other := range others {
+		_ = other
+	}
+	return p
 }
 
 type ResponseOptions struct {
@@ -43,9 +65,13 @@ type ResponseOptions struct {
 	Deprecated  bool
 }
 
-func (r *ResponseOptions) Defaults() {
-	if r == nil {
-		*r = ResponseOptions{}
+func defaultResponseOptions() *ResponseOptions {
+	return &ResponseOptions{}
+}
+
+func (r *ResponseOptions) Merge(others ...*ResponseOptions) *ResponseOptions {
+	for _, other := range others {
+		_ = other
 	}
-	r.Description = strings.TrimSpace(r.Description)
+	return r
 }

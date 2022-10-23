@@ -121,7 +121,8 @@ func init() {
 
 # todo:
 - definitions - add RegisterCustomType that registers type and result of raw swag spec (custom types)
-
+- clone options
+- 
 
 # author
 
