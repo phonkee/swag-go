@@ -27,10 +27,10 @@ func TestInspectParams(t *testing.T) {
 
 		assert.False(t, inspected[2].Required)
 
-		// try path param
+		// try pathImpl param
 		inspected = inspectParams(Some{}, spec.PathParam)
 		assert.NotNil(t, inspected)
-		assert.Equal(t, inspected[0].In, "path")
+		assert.Equal(t, inspected[0].In, "pathImpl")
 	})
 
 	t.Run("test required", func(t *testing.T) {
@@ -71,6 +71,16 @@ func TestInspectParams(t *testing.T) {
 		assert.Equal(t, "Fourth1", inspected[4].Name)
 		assert.Equal(t, "fourth2", inspected[5].Name)
 	})
+
+	t.Run("test arrays/slices", func(t *testing.T) {
+		type Hello struct {
+			Greetings []string `json:"greetings"`
+		}
+
+		inspected := inspectParams(Hello{}, spec.PathParam)
+		assert.Equal(t, "array", inspected[0].Type)
+		// TODO: finish me
+	})
 }
 
 func TestInspectSchema(t *testing.T) {
@@ -83,8 +93,8 @@ func TestInspectSchema(t *testing.T) {
 		defs := spec.Definitions{}
 		schema := inspectSchema(Response{}, defs)
 		assert.NotNil(t, schema)
-		assert.Equal(t, schema.Properties["Some"].ID, "Some")
-		assert.Equal(t, schema.Properties["other"].ID, "other")
+		assert.Equal(t, "Some", schema.Properties["Some"].ID)
+		assert.Equal(t, "other", schema.Properties["other"].ID)
 	})
 
 	t.Run("test top level array", func(t *testing.T) {

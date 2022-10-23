@@ -1,42 +1,69 @@
 package swag
 
-type prefixInfo struct {
-	swagger    *swagger
-	pathPrefix string
-	resetCache func()
-}
+import (
+	"github.com/go-openapi/spec"
+	"github.com/phonkee/swag-go/definitions"
+	"github.com/phonkee/swag-go/params"
+)
 
-func newPrefix(info *prefixInfo) Prefix {
-	info.resetCache()
-	return &prefix{info: info}
-}
-
-// prefix is special path that only creates new paths
 type prefix struct {
-	info *prefixInfo
+	pathParams  params.Params
+	queryParams params.Params
+	path        string
+	options     *PrefixOptions
+	definitions definitions.Definitions
+	responses   Responses
+	updaters    []UpdateSpec
 }
 
-func (p *prefix) Prefix(path string) Prefix {
-	p.info.resetCache()
-	panic("implement me")
+func (s *swag) Prefix(path string, options ...*PrefixOptions) Prefix {
+	result := &prefix{
+		pathParams:  params.New(),
+		queryParams: params.New(),
+		path:        path,
+		options:     defaultPrefixOptions().Merge(options...),
+		definitions: s.definitions,
+		responses:   s.responses.Clone(),
+		updaters:    make([]UpdateSpec, 0),
+	}
+
+	s.updaters = append(s.updaters, result)
+
+	return result
 }
 
-func (p *prefix) Path(path string, method string, options ...*PathOptions) Path {
-	p.info.resetCache()
-	panic("implement me")
-}
+func (p *prefix) Prefix(path string, options ...*PrefixOptions) Prefix {
+	// TODO: add proper path joining here
+	result := &prefix{
+		path:        path,
+		pathParams:  p.pathParams.Clone(),
+		queryParams: p.queryParams.Clone(),
+		options:     p.options.Clone().Merge(options...),
+		definitions: p.definitions,
+		responses:   p.responses.Clone(),
+		updaters:    make([]UpdateSpec, 0),
+	}
 
-func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Prefix {
-	p.info.resetCache()
-	panic("implement me")
+	p.updaters = append(p.updaters, result)
+
+	return result
 }
 
 func (p *prefix) PathParams(i interface{}) Prefix {
-	p.info.resetCache()
-	panic("implement me")
+	p.pathParams.Add(i)
+	return p
 }
 
 func (p *prefix) QueryParams(i interface{}) Prefix {
-	p.info.resetCache()
-	panic("implement me")
+	p.queryParams.Add(i)
+	return p
+}
+
+func (p *prefix) UpdateSpec(swagger *spec.Swagger) error {
+	for _, upd := range p.updaters {
+		if err := upd.UpdateSpec(swagger); err != nil {
+			return err
+		}
+	}
+	return nil
 }

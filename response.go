@@ -1,28 +1,32 @@
 package swag
 
-import "strings"
+type Responses map[int]*response
 
-type ResponseOptions struct {
-	Description string
-	// Headers is any structure with fields
-	Headers interface{}
-}
-
-func (r *ResponseOptions) Defaults() {
-	r.Description = strings.TrimSpace(r.Description)
+func (r Responses) Clone() Responses {
+	result := make(Responses, len(r))
+	for k, v := range r {
+		result[k] = v
+	}
+	return result
 }
 
 type response struct {
 	options *ResponseOptions
 	status  int
-	target  interface{}
 }
 
-func newResponse(status int, target interface{}, options *ResponseOptions) *response {
-	options.Defaults()
-	return &response{
-		options: options,
-		status:  status,
-		target:  target,
-	}
+func (s *swag) Response(status int, response interface{}, options ...*ResponseOptions) Swag {
+	// TODO: add here
+	return s
+}
+
+func (p *pathImpl) Response(status int, what interface{}, options ...*ResponseOptions) Path {
+	//opts := defaultResponseOptions().Merge(options...)
+	// TODO: add response here
+	return p
+}
+
+func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Prefix {
+	// TODO: implement me
+	return p
 }

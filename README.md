@@ -20,13 +20,13 @@ func init() {
 }
 
 type GetPetPathParams struct {
-	ID int `json:"id" swag_description:"primary key in pets database"`
+	ID int `json:"id" swag:"description='primary key in pets database'"`
 }
 
 type Pet struct {
-	ID int `json:"id" swag_description:"unique identifier in database"`
+	ID int `json:"id" swag:"description:'unique identifier in database'"`
 	Name string `json:"name"`
-	Born time.Time `json:"born"`
+	Birthdate time.Time `json:"birth_date"`
 }
 
 type ErrorResponse struct {
@@ -34,7 +34,7 @@ type ErrorResponse struct {
 }
 
 type CreatePetSerializer struct {
-	Name string `json:"name" swag_description:"Name of your pet"`
+	Name string `json:"name" swag:"description='Name of your pet'"`
 }
 
 type FieldValidationError struct {
@@ -42,7 +42,7 @@ type FieldValidationError struct {
 }
 
 type FilterPetsQuery struct {
-	Dogs bool `json:"dogs" swag_description:"only dogs will be returned"`
+	Dogs bool `json:"dogs" swag:"description:'only dogs will be returned'"`
 }
 
 func init() {
@@ -68,34 +68,40 @@ func init() {
 }
 ```
 
-We have also ability to have shared common properties:
+# prefix
+
+We have also ability to have shared common properties by creating prefixes.
+Prefixes share Responses, Path Params, Query Params and of course path prefix.
 
 ```go
 ApiV1 := Service.Prefix("/api/v1/").
 	Response(http.StatusNotFound, nil).
+    Response(http.StatusUnauthorized, nil).
 	Response(http.StatusInternalServerError, ErrorResponse{})
 ```
 
-And even this:
+And even this more complicated example works:
 
 ```go
-type UserIdentifierPathQuery struct {
-	ID int `json:"id"`
+type UserIdentifierPathParams struct {
+	// in this case we use user_id, if there was no definition, we have a look into json (if disabled we do not use field)
+	// if json does not have custom name, we use field name
+	ID int `json:"id" swag:"name=user_id, description='user identifier'"`
 }
 
 type Order struct {
-	ID int `json:"id"`
+	ID int `json:"id" swag:"description='order primary key'"`
 }
 
 type OrderCacheQueryParams struct {
-	NoCache bool `json:"no_cache" swag_description:"when true, orders will be fetched from database"`
+	NoCache bool `json:"no_cache" swag:"description='when true, orders will be fetched from database'"`
 }
 
 func init() {
     // prepare prefix that identifies user by id
-	UsersOrdersApiV1 := Service.Prefix("/api/v1/users/{id}/orders").
+	UsersOrdersApiV1 := ApiV1.Prefix("users/{user_id}/orders").
 		// path params will be inherited in all paths derived from this prefix
-		PathParams(UserIdentifierPathQuery{}).
+		PathParams(UserIdentifierPathParams{}).
 		// query params will be inherited in all paths derived from this prefix 
 		QueryParams(OrderCacheQueryParams{}).
         // responses will be inherited in all paths derived from this prefix
@@ -113,6 +119,10 @@ func init() {
 
 ```
 
+# todo:
+- definitions - add RegisterCustomType that registers type and result of raw swag spec (custom types)
+- clone options
+- 
 
 # author
 
