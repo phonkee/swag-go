@@ -7,14 +7,18 @@ type License struct {
 	URL  string
 }
 
-func (l *License) Spec() *spec.License {
+func (l *License) UpdateSpec(swagger *spec.Swagger) error {
 	if l == nil {
 		return nil
 	}
-	return &spec.License{
+	if swagger.SwaggerProps.Info == nil {
+		return nil
+	}
+	swagger.SwaggerProps.Info.License = &spec.License{
 		LicenseProps: spec.LicenseProps{
 			Name: l.Name,
 			URL:  l.URL,
 		},
 	}
+	return nil
 }

@@ -8,15 +8,19 @@ type ContactInfo struct {
 	Email string
 }
 
-func (c *ContactInfo) Spec() *spec.ContactInfo {
+func (c *ContactInfo) UpdateSpec(swagger *spec.Swagger) error {
 	if c == nil {
 		return nil
 	}
-	return &spec.ContactInfo{
+	if swagger.SwaggerProps.Info == nil {
+		return nil
+	}
+	swagger.SwaggerProps.Info.Contact = &spec.ContactInfo{
 		ContactInfoProps: spec.ContactInfoProps{
 			Name:  c.Name,
 			URL:   c.URL,
 			Email: c.Email,
 		},
 	}
+	return nil
 }

@@ -14,17 +14,19 @@ type prefix struct {
 	definitions definitions.Definitions
 	responses   Responses
 	updaters    []UpdateSpec
+	invalidate  func()
 }
 
 func (s *swag) Prefix(path string, options ...*PrefixOptions) Prefix {
 	result := &prefix{
 		pathParams:  params.New(),
 		queryParams: params.New(),
-		path:        path,
+		path:        pathJoin("", path),
 		options:     defaultPrefixOptions().Merge(options...),
 		definitions: s.definitions,
 		responses:   s.responses.Clone(),
 		updaters:    make([]UpdateSpec, 0),
+		invalidate:  s.invalidate,
 	}
 
 	s.updaters = append(s.updaters, result)
@@ -33,15 +35,15 @@ func (s *swag) Prefix(path string, options ...*PrefixOptions) Prefix {
 }
 
 func (p *prefix) Prefix(path string, options ...*PrefixOptions) Prefix {
-	// TODO: add proper path joining here
 	result := &prefix{
-		path:        p.path + path,
+		path:        pathJoin(p.path, path),
 		pathParams:  p.pathParams.Clone(),
 		queryParams: p.queryParams.Clone(),
 		options:     p.options.Clone().Merge(options...),
 		definitions: p.definitions,
 		responses:   p.responses.Clone(),
 		updaters:    make([]UpdateSpec, 0),
+		invalidate:  p.invalidate,
 	}
 
 	p.updaters = append(p.updaters, result)

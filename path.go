@@ -15,6 +15,7 @@ func (s *swag) Path(path string, method string, options ...*PathOptions) Path {
 		queryParams: params.New(),
 		method:      method,
 		options:     defaultPathOptions().Merge(options...),
+		invalidate:  s.invalidate,
 	}
 	s.updaters = append(s.updaters, result)
 
@@ -23,14 +24,14 @@ func (s *swag) Path(path string, method string, options ...*PathOptions) Path {
 
 func (p *prefix) Path(path string, method string, options ...*PathOptions) Path {
 	result := &pathImpl{
-		// TODO: fix path joining correctly
-		path:        p.path + path,
+		path:        pathJoin(p.path, path),
 		definitions: p.definitions,
 		responses:   p.responses.Clone(),
 		pathParams:  p.pathParams.Clone(),
 		queryParams: p.queryParams.Clone(),
 		method:      method,
 		options:     defaultPathOptions().Merge(options...),
+		invalidate:  p.invalidate,
 	}
 	p.updaters = append(p.updaters, result)
 
@@ -46,6 +47,7 @@ type pathImpl struct {
 	queryParams params.Params
 	method      string
 	options     *PathOptions
+	invalidate  func()
 }
 
 func (p *pathImpl) Body(i interface{}) Path {

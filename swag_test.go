@@ -81,10 +81,12 @@ func TestPrefix(t *testing.T) {
 			Response(http.StatusUnauthorized, nil)
 
 		// get specs
-		spe := p.(*pathImpl).spec()
-		assert.Equal(t, 1, len(spe.Paths))
+		s := defaultSpec("title", nil)
+		assert.NoError(t, p.UpdateSpec(&s))
+
+		assert.Equal(t, 1, len(s.Paths.Paths))
 		assert.NotPanics(t, func() {
-			_ = spe.Paths["/api/v1/user"]
+			_ = s.Paths.Paths["/api/v1/user"]
 		})
 
 		data, err := json.MarshalIndent(swg, "  ", "  ")

@@ -58,34 +58,16 @@ func (s *swag) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 func (s *swag) spec() *spec.Swagger {
 	// only once please
 	s.once.Do(func() {
-		s.specification = spec.Swagger{
-			VendorExtensible: spec.VendorExtensible{},
-			SwaggerProps: spec.SwaggerProps{
-				//ID:      "http://localhost:3849/api-docs",
-				Swagger:  "2.0",
-				Consumes: []string{"application/json"},
-				Produces: []string{"application/json"},
-				Schemes:  []string{"https"},
-				Info: &spec.Info{
-					InfoProps: spec.InfoProps{
-						Description:    s.options.Description,
-						Title:          s.title,
-						TermsOfService: s.options.TermsOfServices,
-						Contact:        s.options.Contact.Spec(),
-						License:        s.options.License.Spec(),
-						Version:        s.options.Version,
-					},
-				},
-				// Host:     "some.api.out.there",
-				// BasePath: "",
-				Paths: &spec.Paths{
-					VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
-					Paths:            map[string]spec.PathItem{},
-				},
-			},
+		// get specification
+		s.specification = defaultSpec(s.title, s.options)
+
+		// updaters other than s.updaters
+		updaters := []UpdateSpec{
+			s.options.License,
+			s.options.Contact,
 		}
 
-		for _, updater := range s.updaters {
+		for _, updater := range append(updaters, s.updaters...) {
 			if err := updater.UpdateSpec(&s.specification); err != nil {
 				panic(err)
 			}
