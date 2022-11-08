@@ -163,7 +163,7 @@ func (d *definitions) RegisterType(what reflect.Type, fn func(schema *spec.Schem
 }
 
 // UpdateSpec updates spec.Definitions with given one
-func (d *definitions) UpdateSpec(_ *spec.Swagger) error {
-	// TODO: add specs
+func (d *definitions) UpdateSpec(s *spec.Swagger) error {
+	s.Definitions = d.definitions
 	return nil
 }

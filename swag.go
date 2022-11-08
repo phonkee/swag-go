@@ -34,7 +34,7 @@ type swag struct {
 	updaters      []UpdateSpec
 }
 
-// no-op
+// Debug is no-op for now, will be implemented in future
 func (s *swag) Debug() {
 }
 
@@ -73,8 +73,14 @@ func (s *swag) spec() *spec.Swagger {
 			}
 		}
 
-		if s.definitions.UpdateSpec(&s.specification) != nil {
-			panic("cannot update definitions")
+		updaters = []UpdateSpec{
+			s.definitions,
+		}
+
+		for _, updater := range append(updaters, s.updaters...) {
+			if err := updater.UpdateSpec(&s.specification); err != nil {
+				panic(err)
+			}
 		}
 	})
 	return &s.specification
@@ -96,33 +102,4 @@ func (s *swag) UpdateSpec(swagger *spec.Swagger) error {
 		}
 	}
 	return nil
-}
-
-func defaultSpec(title string, opts *Options) spec.Swagger {
-	o := defaultOptions().Merge(opts)
-
-	return spec.Swagger{
-		VendorExtensible: spec.VendorExtensible{},
-		SwaggerProps: spec.SwaggerProps{
-			//ID:      "http://localhost:3849/api-docs",
-			Swagger:  "2.0",
-			Consumes: []string{"application/json"},
-			Produces: []string{"application/json"},
-			Schemes:  []string{"https"},
-			Info: &spec.Info{
-				InfoProps: spec.InfoProps{
-					Description:    o.Description,
-					Title:          title,
-					TermsOfService: o.TermsOfServices,
-					Version:        o.Version,
-				},
-			},
-			// Host:     "some.api.out.there",
-			// BasePath: "",
-			Paths: &spec.Paths{
-				VendorExtensible: spec.VendorExtensible{Extensions: map[string]interface{}{"x-framework": XFramework}},
-				Paths:            map[string]spec.PathItem{},
-			},
-		},
-	}
 }
