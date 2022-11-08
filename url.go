@@ -1,6 +1,7 @@
 package swag
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 )
@@ -16,11 +17,13 @@ func pathJoin(left, right string) string {
 	}
 
 	r, err := url.JoinPath(left, right)
+	if err != nil {
+		panic(fmt.Errorf("%w: cannot join %s and %s", err, left, right))
+	}
 
 	if len(left) > 0 && left[0] != '/' {
 		return "/" + r
 	}
 
-	_ = err
 	return r
 }
