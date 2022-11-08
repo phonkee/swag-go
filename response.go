@@ -3,17 +3,20 @@ package swag
 import "github.com/go-openapi/spec"
 
 func (s *swag) Response(status int, response interface{}, options ...*ResponseOptions) Swag {
+	defer s.invalidate()
 	// TODO: add here
 	return s
 }
 
 func (p *pathImpl) Response(status int, what interface{}, options ...*ResponseOptions) Path {
+	defer p.invalidate()
 	//opts := defaultResponseOptions().Merge(options...)
 	// TODO: add response here
 	return p
 }
 
 func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Prefix {
+	defer p.invalidate()
 	// TODO: implement me
 	return p
 }

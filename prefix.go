@@ -52,11 +52,13 @@ func (p *prefix) Prefix(path string, options ...*PrefixOptions) Prefix {
 }
 
 func (p *prefix) PathParams(i interface{}) Prefix {
+	defer p.invalidate()
 	p.pathParams.Add(i)
 	return p
 }
 
 func (p *prefix) QueryParams(i interface{}) Prefix {
+	defer p.invalidate()
 	p.queryParams.Add(i)
 	return p
 }

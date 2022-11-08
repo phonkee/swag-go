@@ -51,16 +51,19 @@ type pathImpl struct {
 }
 
 func (p *pathImpl) Body(i interface{}) Path {
+	defer p.invalidate()
 	//TODO implement me
 	panic("implement me")
 }
 
 func (p *pathImpl) PathParams(i interface{}) Path {
+	defer p.invalidate()
 	p.pathParams.Add(i)
 	return p
 }
 
 func (p *pathImpl) QueryParams(i interface{}) Path {
+	defer p.invalidate()
 	p.queryParams.Add(i)
 	return p
 }
