@@ -35,7 +35,7 @@ func (s *swag) Prefix(path string, options ...*PrefixOptions) Prefix {
 func (p *prefix) Prefix(path string, options ...*PrefixOptions) Prefix {
 	// TODO: add proper path joining here
 	result := &prefix{
-		path:        path,
+		path:        p.path + path,
 		pathParams:  p.pathParams.Clone(),
 		queryParams: p.queryParams.Clone(),
 		options:     p.options.Clone().Merge(options...),

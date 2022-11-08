@@ -17,6 +17,7 @@ var Service swag.Swagger
 func init() {
 	// initialize swag Swagger
 	Service = swag.New("pet store")
+	Service.Response(http.StatusUnauthorized, nil)
 }
 
 type GetPetPathParams struct {

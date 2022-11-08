@@ -36,7 +36,7 @@ type definitions struct {
 // Register registers given type with given schema, this is called recursively and when definition is already registered
 // it uses it. Due to the fact that this is recursive, we cannot protect map access to map with mutex, so it's not
 // currently safe to use concurrently.
-func (d *definitions) Register(what interface{}) spec.Schema {
+func (d *definitions) Register(what any) spec.Schema {
 	typ := reflect.TypeOf(what)
 	val := reflect.ValueOf(what)
 
