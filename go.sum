@@ -31,6 +31,8 @@ github.com/matryer/resync v0.0.0-20161211202428-d39c09a11215 h1:hDa3vAq/Zo5gjfJ4
 github.com/matryer/resync v0.0.0-20161211202428-d39c09a11215/go.mod h1:LH+NgPY9AJpDfqAFtzyer01N9MYNsAKUf3DC9DV1xIY=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
+github.com/phonkee/attribs v1.0.0 h1:3rADdb69UuN+0lNLM6k2WPGy5RRtnwN4f5G+8deyHB0=
+github.com/phonkee/attribs v1.0.0/go.mod h1:czT0y6yKWBpJJyIxEKm1xVY/zrVbpGDr7ud4uWZBp4s=
 github.com/phonkee/go-collection v0.0.0-20220829225933-8d889984219d h1:9NKnbJAo10ls7sTOC9WvbbSmfkOIWednPUBb8egiHwI=
 github.com/phonkee/go-collection v0.0.0-20220829225933-8d889984219d/go.mod h1:Qg9YAWCymAgJOmojxbZyR82G/sHz7Ig3n91F1AjRKhU=
 github.com/phonkee/tagstruct v0.1.0 h1:CT1GcpmUhctzC6i0Gfx7bWgoHXmHWL4QMdpySBu55I8=

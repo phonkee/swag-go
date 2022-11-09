@@ -2,6 +2,7 @@ package swag
 
 import "github.com/go-openapi/spec"
 
+// Response adds a default response.
 func (s *swag) Response(status int, response interface{}, options ...*ResponseOptions) Swag {
 	defer s.invalidate()
 	// TODO: add here
@@ -17,6 +18,7 @@ func (p *pathImpl) Response(status int, what interface{}, options ...*ResponseOp
 
 func (p *prefix) Response(status int, response interface{}, options ...*ResponseOptions) Prefix {
 	defer p.invalidate()
+	//p.responses
 	// TODO: implement me
 	return p
 }
@@ -37,6 +39,6 @@ type response struct {
 	status  int
 }
 
-func (r *response) UpdateSpec(swagger *spec.Swagger) error {
+func (r *response) Operation() *spec.Operation {
 	panic("implement me")
 }
